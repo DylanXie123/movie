@@ -1,6 +1,6 @@
 {
-  "name": "electron-template",
-  "productName": "electron-template",
+  "name": "movie",
+  "productName": "movie",
   "version": "1.0.0",
   "description": "Electron app with electron-forge, svelte, webpack and typescript!",
   "main": ".webpack/main",
