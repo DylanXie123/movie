@@ -1,5 +1,6 @@
 const rules = require('./webpack.rules');
 const path = require('path');
+const Dotenv = require('dotenv-webpack');
 
 rules.push({
   test: /\.css$/,
@@ -18,4 +19,7 @@ module.exports = {
     extensions: ['.mjs', '.js', '.ts', '.svelte'],
     mainFields: ['svelte', 'browser', 'module', 'main']
   },
+  plugins: [
+    new Dotenv()
+  ],
 };

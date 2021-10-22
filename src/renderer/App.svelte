@@ -1,4 +1,7 @@
 <script lang="ts">
+  import IMDBAPI from "../api/IMDB";
+  import TMDBAPI from "../api/TMDB";
+
   const basePath = "D:\\OneDrive - stu.xjtu.edu.cn\\Downloads";
   let dirs = readFileNode(basePath);
 
@@ -11,10 +14,16 @@
   }
 
   function readFileNode(path: string) {
-    console.log(window.fsAPI.readFileNode(path));
     return window.fsAPI.readFileNode(path);
   }
+
+  async function displayAPI() {
+    const response = await TMDBAPI.searchMovie("550");
+    console.log(response);
+  }
 </script>
+
+<button on:click={displayAPI}>Click</button>
 
 <ol>
   {#each dirs as dir}

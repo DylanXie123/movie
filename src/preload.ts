@@ -61,11 +61,21 @@ const api = {
   raw: fs,
 };
 
+const api_key = {
+  TMDB: process.env.TMDB_API_KEY!,
+  IMDB: process.env.IMDB_API_KEY!,
+};
+
+console.log(api_key);
+console.log(process.env);
+
 contextBridge.exposeInMainWorld('fsAPI', api);
+contextBridge.exposeInMainWorld('api_key', api_key);
 
 declare global {
   interface Window {
     fsAPI: typeof api;
+    api_key: typeof api_key;
   }
 }
 
