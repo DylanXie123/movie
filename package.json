@@ -57,7 +57,15 @@
                   "preload": {
                     "js": "./src/preload.ts"
                   },
-                  "name": "main_window"
+                  "name": "index"
+                },
+                {
+                  "html": "./src/renderer/index.html",
+                  "js": "./src/renderer/renderer.ts",
+                  "preload": {
+                    "js": "./src/preload.ts"
+                  },
+                  "name": "detail"
                 }
               ]
             }
@@ -88,6 +96,7 @@
     "typescript": "^4.4.3"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "svelte-routing": "^1.6.0"
   }
 }

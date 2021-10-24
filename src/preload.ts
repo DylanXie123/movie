@@ -66,9 +66,6 @@ const api_key = {
   IMDB: process.env.IMDB_API_KEY!,
 };
 
-console.log(api_key);
-console.log(process.env);
-
 contextBridge.exposeInMainWorld('fsAPI', api);
 contextBridge.exposeInMainWorld('api_key', api_key);
 
