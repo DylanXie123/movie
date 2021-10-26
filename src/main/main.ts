@@ -1,4 +1,5 @@
 import { app, BrowserWindow } from 'electron';
+import Store from 'electron-store';
 
 declare const INDEX_WEBPACK_ENTRY: string;
 declare const INDEX_PRELOAD_WEBPACK_ENTRY: string;
@@ -23,6 +24,8 @@ const createWindow = () => {
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
+
+  Store.initRenderer();
 };
 
 // This method will be called when Electron has finished

@@ -1,7 +1,7 @@
 import { contextBridge } from 'electron';
 import fs from 'original-fs';
 import { join } from 'path';
-import FileNode from './FileNode';
+import FileNode from './fileNode';
 
 const readDir = (path: string) => {
   const dirents = fs.readdirSync(path, { withFileTypes: true });
@@ -26,39 +26,59 @@ const statSync = (path: string) => {
   }
 }
 
-const readFileNode = (path: string): FileNode[] => {
-  const dirs = readDir(path);
-  return dirs.map(dir => {
-    if (dir.isDirectory) {
-      let stat = statSync(join(path, dir.name));
-      return new FileNode({
-        name: dir.name,
-        blocks: stat.blocks,
-        blksize: stat.blksize,
-        size: stat.size,
-        isDirectory: dir.isDirectory,
-        isFile: dir.isFile,
-        children: readFileNode(join(path, dir.name)),
-      });
-    } else {
-      let stat = statSync(join(path, dir.name));
-      return new FileNode({
-        name: dir.name,
-        blocks: stat.blocks,
-        blksize: stat.blksize,
-        size: stat.size,
-        isDirectory: dir.isDirectory,
-        isFile: dir.isFile,
-      });
-    }
+const readFileTree = (root: FileNode): FileNode => {
+  const dirs = readDir(root.fullPath);
+  const subTree = dirs.map(dir => {
+    const subPath = join(root.fullPath, dir.name);
+    const stat = statSync(subPath);
+    const fileNode = new FileNode({
+      fullPath: subPath,
+      blocks: stat.blocks,
+      blksize: stat.blksize,
+      size: stat.size,
+      isDirectory: dir.isDirectory,
+      isFile: dir.isFile,
+    });
+    return dir.isDirectory ? readFileTree(fileNode) : fileNode;
   });
+  root.children = subTree;
+  return root;
+}
+
+const initFileTree = (path: string) => {
+  const stat = fs.statSync(path);
+  if (stat.isDirectory()) {
+    const fileNode = new FileNode({
+      fullPath: path,
+      blocks: stat.blocks,
+      blksize: stat.blksize,
+      size: stat.size,
+      isDirectory: true,
+      isFile: false,
+    });
+    return readFileTree(fileNode);
+  } else {
+    throw new Error(`${path} is not a directory`);
+  }
+}
+
+const flatFileTree = (fileTree: FileNode): FileNode[] => {
+  const fileList = [];
+  if (fileTree.children) {
+    for (const item of fileTree.children) {
+      fileList.push(...flatFileTree(item));
+    }
+    return fileList;
+  } else {
+    return [fileTree];
+  }
 }
 
 const api = {
   readDir: readDir,
   statSync: statSync,
-  readFileNode: readFileNode,
-  raw: fs,
+  initFileTree: initFileTree,
+  flatFileTree: flatFileTree,
 };
 
 const api_key = {

@@ -97,6 +97,8 @@
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
+    "electron-store": "^8.0.1",
+    "path-browserify": "^1.0.1",
     "svelte-routing": "^1.6.0"
   }
 }
