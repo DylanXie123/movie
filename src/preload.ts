@@ -1,7 +1,7 @@
-import { contextBridge } from 'electron';
+import { contextBridge, ipcRenderer } from 'electron';
 import fs from 'original-fs';
 import { join } from 'path';
-import FileNode from './fileNode';
+import FileNode, { DBNode } from './fileNode';
 
 const readDir = (path: string) => {
   const dirents = fs.readdirSync(path, { withFileTypes: true });
@@ -74,7 +74,7 @@ const flatFileTree = (fileTree: FileNode): FileNode[] => {
   }
 }
 
-const api = {
+const fsAPI = {
   readDir: readDir,
   statSync: statSync,
   initFileTree: initFileTree,
@@ -86,13 +86,39 @@ const api_key = {
   IMDB: process.env.IMDB_API_KEY!,
 };
 
-contextBridge.exposeInMainWorld('fsAPI', api);
+const dbAPI = {
+  create: (item: DBNode) => ipcRenderer.send('create', item),
+  retrieve: async (fullPath: string) => { },
+  update: async (pathKey: string) => { },
+  delete: async (pathKey: string) => { },
+  retrieveAll: () => ipcRenderer.send('retrieveAll'),
+};
+
+// dbAPI.create({
+//   fullPath: 'sth',
+//   title: 'new movie',
+//   TMDB_ID: 0,
+//   IMDB_ID: 0,
+//   poster_URL: '',
+//   background_URL: '',
+//   overview: '',
+//   language: '',
+//   release_Date: 0,
+//   TMDB_Rating: 0,
+//   IMDB_Rating: 0,
+// });
+
+dbAPI.retrieveAll();
+
+contextBridge.exposeInMainWorld('fsAPI', fsAPI);
 contextBridge.exposeInMainWorld('api_key', api_key);
+contextBridge.exposeInMainWorld('dbAPI', dbAPI);
 
 declare global {
   interface Window {
-    fsAPI: typeof api;
+    fsAPI: typeof fsAPI;
     api_key: typeof api_key;
+    dbAPI: typeof dbAPI;
   }
 }
 

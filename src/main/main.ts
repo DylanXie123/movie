@@ -1,5 +1,7 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import Store from 'electron-store';
+import type { DBNode } from '../fileNode';
+import { closeDB, create, initDatabase, retrieveAll } from './database';
 
 declare const INDEX_WEBPACK_ENTRY: string;
 declare const INDEX_PRELOAD_WEBPACK_ENTRY: string;
@@ -10,6 +12,7 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 }
 
 const createWindow = () => {
+  initDatabase();
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
@@ -38,6 +41,7 @@ app.on('ready', createWindow);
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    closeDB();
     app.quit();
   }
 });
@@ -52,3 +56,10 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+ipcMain.on('create', (_event, item: DBNode) => {
+  create(item);
+})
+
+ipcMain.on('retrieveAll', (event) => {
+  event.reply('retrieveAllReply', retrieveAll());
+})

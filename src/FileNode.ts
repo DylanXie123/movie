@@ -26,6 +26,20 @@ export interface MovieProp {
   imdb_rating?: number;
 }
 
+export interface DBNode {
+  fullPath: string;
+  title: string;
+  TMDB_ID: number;
+  IMDB_ID: number;
+  poster_URL: string;
+  background_URL: string;
+  overview?: string;
+  language?: string;
+  release_Date?: number;
+  TMDB_Rating?: number;
+  IMDB_Rating?: number;
+}
+
 export default class FileNode {
   constructor(props: FileNodeProp) {
     this.fullPath = props.fullPath;
