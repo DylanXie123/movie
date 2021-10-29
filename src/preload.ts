@@ -1,7 +1,8 @@
+import type Database from 'better-sqlite3';
 import { contextBridge, ipcRenderer } from 'electron';
 import fs from 'original-fs';
 import { join } from 'path';
-import FileNode, { DBNode } from './fileNode';
+import FileNode, { DBNode, UpdateType } from './fileNode';
 
 const readDir = (path: string) => {
   const dirents = fs.readdirSync(path, { withFileTypes: true });
@@ -87,28 +88,12 @@ const api_key = {
 };
 
 const dbAPI = {
-  create: (item: DBNode) => ipcRenderer.send('create', item),
-  retrieve: async (fullPath: string) => { },
-  update: async (pathKey: string) => { },
-  delete: async (pathKey: string) => { },
-  retrieveAll: () => ipcRenderer.send('retrieveAll'),
+  create: (item: DBNode) => ipcRenderer.invoke('create', item) as Promise<Database.RunResult>,
+  retrieve: (fullPath: string) => ipcRenderer.invoke('retrieve', fullPath) as Promise<DBNode>,
+  update: (newData: UpdateType) => ipcRenderer.invoke('update', newData) as Promise<Database.RunResult>,
+  delete: (fulllPath: string) => ipcRenderer.invoke('delete', fulllPath) as Promise<Database.RunResult>,
+  retrieveAll: () => ipcRenderer.invoke('retrieveAll') as Promise<DBNode[]>,
 };
-
-// dbAPI.create({
-//   fullPath: 'sth',
-//   title: 'new movie',
-//   TMDB_ID: 0,
-//   IMDB_ID: 0,
-//   poster_URL: '',
-//   background_URL: '',
-//   overview: '',
-//   language: '',
-//   release_Date: 0,
-//   TMDB_Rating: 0,
-//   IMDB_Rating: 0,
-// });
-
-dbAPI.retrieveAll();
 
 contextBridge.exposeInMainWorld('fsAPI', fsAPI);
 contextBridge.exposeInMainWorld('api_key', api_key);

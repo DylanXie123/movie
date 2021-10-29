@@ -1,4 +1,5 @@
 import type { MovieProp } from "../fileNode";
+import IMDBAPI from "./IMDB";
 
 export default class TMDBAPI {
   static baseURL = "https://api.themoviedb.org/";
@@ -9,14 +10,14 @@ export default class TMDBAPI {
     const json = await response.json();
     return {
       title: json.title,
-      tmdb_id: json.id,
-      imdb_id: json.imdb_id,
-      poster_url: json.poster_path,
-      background_url: json.backdrop_path,
+      tmdbID: json.id,
+      imdbID: json.imdb_id,
+      posterURL: json.poster_path,
+      backgroundURL: json.backdrop_path,
       overview: json.overview,
       language: json.original_language,
-      release_date: json.release_date,
-      tmdb_rating: json.vote_average,
+      releaseDate: json.release_date,
+      tmdbRating: json.vote_average,
     };
   }
 
@@ -29,14 +30,14 @@ export default class TMDBAPI {
       const elm = json.movie_results[0];
       return {
         title: elm.title,
-        tmdb_id: elm.id,
-        imdb_id: elm.imdb_id,
-        poster_url: elm.poster_path,
-        background_url: elm.backdrop_path,
+        tmdbID: elm.id,
+        imdbID: elm.imdb_id,
+        posterURL: elm.poster_path,
+        backgroundURL: elm.backdrop_path,
         overview: elm.overview,
         language: elm.original_language,
-        release_date: elm.release_date,
-        tmdb_rating: elm.vote_average,
+        releaseDate: elm.release_date,
+        tmdbRating: elm.vote_average,
       };
     } catch (error) {
       return undefined;
@@ -51,15 +52,24 @@ export default class TMDBAPI {
     const elms = json.results as [];
     return elms.map((elm: any) => ({
       title: elm.title,
-      tmdb_id: elm.id,
-      imdb_id: elm.imdb_id,
-      poster_url: elm.poster_path,
-      background_url: elm.backdrop_path,
+      tmdbID: elm.id,
+      imdbID: elm.imdb_id,
+      posterURL: elm.poster_path,
+      backgroundURL: elm.backdrop_path,
       overview: elm.overview,
       language: elm.original_language,
-      release_date: elm.release_date,
-      tmdb_rating: elm.vote_average,
+      releaseDate: elm.release_date,
+      tmdbRating: elm.vote_average,
     }));
+  }
+
+  static useIMDBSearch = async (movieName: string): Promise<MovieProp | undefined> => {
+    const results = await IMDBAPI.searchTitle(movieName);
+    if (results) {
+      return await this.findMovie(results[0]);
+    } else {
+      return undefined;
+    }
   }
 }
 

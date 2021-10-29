@@ -14,31 +14,20 @@ export interface FileNodeProp {
 
 export interface MovieProp {
   title: string;
-  tmdb_id: string;
-  imdb_id: string;
-  poster_url: string;
-  background_url: string;
-
+  tmdbID: number;
+  imdbID: number;
+  posterURL: string;
+  backgroundURL: string;
   overview?: string;
   language?: string;
-  release_date?: Date;
-  tmdb_rating?: number;
-  imdb_rating?: number;
+  releaseDate?: Date;
+  tmdbRating?: number;
+  imdbRating?: number;
 }
 
-export interface DBNode {
-  fullPath: string;
-  title: string;
-  TMDB_ID: number;
-  IMDB_ID: number;
-  poster_URL: string;
-  background_URL: string;
-  overview?: string;
-  language?: string;
-  release_Date?: number;
-  TMDB_Rating?: number;
-  IMDB_Rating?: number;
-}
+export type DBNode = Omit<MovieProp, "releaseDate"> & { fullPath: string, releaseDate?: number };
+
+export type UpdateType = Partial<Omit<DBNode, "fullPath">> & { fullPath: string };
 
 export default class FileNode {
   constructor(props: FileNodeProp) {

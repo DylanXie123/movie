@@ -1,6 +1,6 @@
 import Database from 'better-sqlite3';
 import { app } from 'electron';
-import type { DBNode } from '../fileNode';
+import type { DBNode, UpdateType } from '../fileNode';
 
 const connectToDatabase = () => {
   // If in debug mode, files will be saved to the root directory of the repository.
@@ -21,15 +21,15 @@ export const initDatabase = () => {
     CREATE TABLE IF NOT EXISTS Movie (
       fullPath	TEXT NOT NULL UNIQUE,
       title	TEXT NOT NULL,
-      TMDB_ID	INTEGER NOT NULL,
-      IMDB_ID	INTEGER NOT NULL,
-      poster_URL	TEXT NOT NULL,
-      background_URL	TEXT NOT NULL,
+      tmdbID	INTEGER NOT NULL,
+      imdbID	INTEGER NOT NULL,
+      posterURL	TEXT NOT NULL,
+      backgroundURL	TEXT NOT NULL,
       overview	TEXT,
       language	TEXT,
-      release_Date	INTEGER,
-      TMDB_Rating	NUMERIC,
-      IMDB_Rating	NUMERIC,
+      releaseDate	INTEGER,
+      tmdbRating	NUMERIC,
+      imdbRating	NUMERIC,
       PRIMARY KEY("fullPath")
     )
   `).run();
@@ -38,28 +38,38 @@ export const initDatabase = () => {
 export const create = (item: DBNode) => {
   const insert = db.prepare(`
     INSERT INTO Movie VALUES 
-    (@fullPath, @title, @TMDB_ID, @IMDB_ID, @poster_URL, @background_URL, 
-      @overview, @language, @release_Date, @TMDB_Rating, @IMDB_Rating)
+    (@fullPath, @title, @tmdbID, @imdbID, @posterURL, @backgroundURL, 
+      @overview, @language, @releaseDate, @tmdbRating, @imdbRating)
   `);
-  insert.run(item);
+  return insert.run(item);
 }
 
-export const update = (item: DBNode) => { }
+export const update = (newData: UpdateType) => {
+  let query = '';
+  for (const key in newData) {
+    query = query + `, ${key} = @${key}`;
+  }
+  query = query.slice(2);
+  const updateItem = db.prepare(`UPDATE Movie SET ${query} WHERE fullPath = @fullPath`);
+  return updateItem.run(newData);
+}
 
-export const retrieve = (fullPath: string) => { }
+export const retrieve = (fullPath: string) => {
+  const selectItem = db.prepare(`SELECT * FROM Movie WHERE fullPath = @fullPath`);
+  return selectItem.all({ fullPath });
+}
 
 export const retrieveAll = () => {
   const retrieve = db.prepare(`SELECT * FROM Movie`);
   const result = retrieve.all();
-  console.log(result);
   return result;
 }
 
 export const deleteDB = (fullPath: string) => {
   const del = db.prepare(`DELETE FROM Movie WHERE fullPath = @fullPath`);
-  del.run({ fullPath });
+  return del.run({ fullPath });
 }
 
 export const closeDB = () => {
-  db.close();
+  return db.close();
 }

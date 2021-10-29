@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import Store from 'electron-store';
-import type { DBNode } from '../fileNode';
-import { closeDB, create, initDatabase, retrieveAll } from './database';
+import type { DBNode, UpdateType } from '../fileNode';
+import { closeDB, create, deleteDB, initDatabase, retrieve, retrieveAll, update } from './database';
 
 declare const INDEX_WEBPACK_ENTRY: string;
 declare const INDEX_PRELOAD_WEBPACK_ENTRY: string;
@@ -56,10 +56,22 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
-ipcMain.on('create', (_event, item: DBNode) => {
-  create(item);
+ipcMain.handle('create', (_event, item: DBNode) => {
+  return create(item);
 })
 
-ipcMain.on('retrieveAll', (event) => {
-  event.reply('retrieveAllReply', retrieveAll());
+ipcMain.handle('update', (_event, newData: UpdateType) => {
+  return update(newData);
+})
+
+ipcMain.handle('retrieve', (_event, fulllPath: string) => {
+  return retrieve(fulllPath);
+})
+
+ipcMain.handle('delete', (_event, fulllPath: string) => {
+  return deleteDB(fulllPath);
+})
+
+ipcMain.handle('retrieveAll', (_event) => {
+  return retrieveAll();
 })
