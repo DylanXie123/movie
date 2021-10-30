@@ -1,13 +1,10 @@
 <script lang="ts">
-  import IMDBAPI from "../../api/IMDB";
-  import TMDBAPI from "../../api/TMDB";
-  import type FileNode from "../../fileNode";
   import fileNodeStore from "../store/fileNodeStore";
 </script>
 
 <ul>
   {#each $fileNodeStore as node}
-    <li>{node.movie}</li>
+    <li>{node.parsed.base}</li>
   {/each}
 </ul>
 

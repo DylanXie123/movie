@@ -27,59 +27,58 @@ const statSync = (path: string) => {
   }
 }
 
-const readFileTree = (root: FileNode): FileNode => {
-  const dirs = readDir(root.fullPath);
-  const subTree = dirs.map(dir => {
-    const subPath = join(root.fullPath, dir.name);
-    const stat = statSync(subPath);
-    const fileNode = new FileNode({
-      fullPath: subPath,
-      blocks: stat.blocks,
-      blksize: stat.blksize,
-      size: stat.size,
-      isDirectory: dir.isDirectory,
-      isFile: dir.isFile,
-    });
-    return dir.isDirectory ? readFileTree(fileNode) : fileNode;
+const existSync = (path: string) => fs.existsSync(path);
+
+const readSingleFileNode = (path: string) => {
+  const stat = statSync(path);
+  const newNode = new FileNode({
+    fullPath: path,
+    blocks: stat.blocks,
+    blksize: stat.blksize,
+    size: stat.size,
   });
-  root.children = subTree;
-  return root;
+  return newNode;
 }
 
-const initFileTree = (path: string) => {
+const readFileNodes = (path: string): FileNode[] => {
+  const dirs = readDir(path);
+  let nodes: FileNode[] = [];
+  dirs.forEach(dir => {
+    if (dir.isDirectory) {
+      const subPath = join(path, dir.name);
+      const newNodes = readFileNodes(subPath);
+      nodes.push(...newNodes);
+    } else {
+      const fullPath = join(path, dir.name);
+      const newNode = readSingleFileNode(fullPath);
+      nodes.push(newNode);
+    }
+  });
+  return nodes;
+}
+
+const initFileNodes = (path: string) => {
   const stat = fs.statSync(path);
   if (stat.isDirectory()) {
-    const fileNode = new FileNode({
-      fullPath: path,
-      blocks: stat.blocks,
-      blksize: stat.blksize,
-      size: stat.size,
-      isDirectory: true,
-      isFile: false,
-    });
-    return readFileTree(fileNode);
+    return readFileNodes(path);
   } else {
     throw new Error(`${path} is not a directory`);
   }
 }
 
-const flatFileTree = (fileTree: FileNode): FileNode[] => {
-  const fileList = [];
-  if (fileTree.children) {
-    for (const item of fileTree.children) {
-      fileList.push(...flatFileTree(item));
+const addLitsener = (path: string, listener: (filename: string) => void) => {
+  fs.watch(path, { recursive: true }, (event, filename) => {
+    if (event === 'rename') {
+      listener(filename);
     }
-    return fileList;
-  } else {
-    return [fileTree];
-  }
+  });
 }
 
 const fsAPI = {
-  readDir: readDir,
-  statSync: statSync,
-  initFileTree: initFileTree,
-  flatFileTree: flatFileTree,
+  existSync: existSync,
+  readSingleFileNode: readSingleFileNode,
+  initFileNodes: initFileNodes,
+  addLitsener: addLitsener,
 };
 
 const api_key = {

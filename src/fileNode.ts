@@ -5,10 +5,6 @@ export interface FileNodeProp {
   blocks: number;
   blksize: number;
   size: number;
-  isDirectory: boolean;
-  isFile: boolean;
-
-  children?: FileNode[];
   movie?: MovieProp;
 }
 
@@ -25,7 +21,7 @@ export interface MovieProp {
   imdbRating?: number;
 }
 
-export type DBNode = Omit<MovieProp, "releaseDate"> & { fullPath: string, releaseDate?: number };
+export type DBNode = Omit<MovieProp, "releaseDate"> & { fullPath: string, releaseDate?: string };
 
 export type UpdateType = Partial<Omit<DBNode, "fullPath">> & { fullPath: string };
 
@@ -36,9 +32,6 @@ export default class FileNode {
     this.blocks = props.blocks;
     this.blksize = props.blksize;
     this.size = props.size;
-    this.isDirectory = props.isDirectory;
-    this.isFile = props.isFile;
-    this.children = props.children;
     this.movie = props.movie;
   }
 
@@ -47,9 +40,14 @@ export default class FileNode {
   blocks: number;
   blksize: number;
   size: number;
-  isDirectory: boolean;
-  isFile: boolean;
-
-  children?: FileNode[];
   movie?: MovieProp;
+
+
+  get onDisk() {
+    return this.blocks === 0;
+  }
+
+  get diskSize() {
+    return this.blocks * this.blksize;
+  }
 }

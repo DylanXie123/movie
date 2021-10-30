@@ -15,7 +15,7 @@
         backgroundURL: "https://via.placeholder.com/300x450",
         overview: "",
         language: "",
-        releaseDate: 0,
+        releaseDate: '0',
         tmdbRating: 0,
         imdbRating: 0,
       })
@@ -32,7 +32,7 @@
         backgroundURL: "https://via.placeholder.com/300x450",
         overview: "",
         language: "",
-        releaseDate: 0,
+        releaseDate: '0',
         tmdbRating: 0,
         imdbRating: 0,
       })
@@ -49,6 +49,19 @@
     window.dbAPI
       .delete("https://svelte-routing.firebaseio.com/")
       .then(console.log);
+
+  const readFileNods = () => {
+    const a = window.fsAPI.initFileNodes(
+      "D:\\OneDrive - stu.xjtu.edu.cn\\Downloads"
+    );
+    console.log(a);
+    window.fsAPI.addLitsener(
+      "D:\\OneDrive - stu.xjtu.edu.cn\\Downloads",
+      (fileName) => {
+        console.log(fileName);
+      }
+    );
+  };
 </script>
 
 <button on:click={create}>Create</button>
@@ -56,6 +69,7 @@
 <button on:click={retrieve}>Retrieve</button>
 <button on:click={retrieveAll}>RetrieveAll</button>
 <button on:click={deleteItem}>Delete</button>
+<button on:click={readFileNods}>Test</button>
 
 <Router>
   <nav>

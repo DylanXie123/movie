@@ -27,7 +27,7 @@ export const initDatabase = () => {
       backgroundURL	TEXT NOT NULL,
       overview	TEXT,
       language	TEXT,
-      releaseDate	INTEGER,
+      releaseDate	TEXT,
       tmdbRating	NUMERIC,
       imdbRating	NUMERIC,
       PRIMARY KEY("fullPath")

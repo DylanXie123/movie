@@ -16,7 +16,7 @@ export default class TMDBAPI {
       backgroundURL: json.backdrop_path,
       overview: json.overview,
       language: json.original_language,
-      releaseDate: json.release_date,
+      releaseDate: json.release_date ? new Date(json.release_date) : undefined,
       tmdbRating: json.vote_average,
     };
   }
@@ -31,12 +31,12 @@ export default class TMDBAPI {
       return {
         title: elm.title,
         tmdbID: elm.id,
-        imdbID: elm.imdb_id,
+        imdbID: parseInt(external_id.slice(2)),
         posterURL: elm.poster_path,
         backgroundURL: elm.backdrop_path,
         overview: elm.overview,
         language: elm.original_language,
-        releaseDate: elm.release_date,
+        releaseDate: elm.release_date ? new Date(elm.release_date) : undefined,
         tmdbRating: elm.vote_average,
       };
     } catch (error) {
@@ -58,7 +58,7 @@ export default class TMDBAPI {
       backgroundURL: elm.backdrop_path,
       overview: elm.overview,
       language: elm.original_language,
-      releaseDate: elm.release_date,
+      releaseDate: elm.release_date ? new Date(elm.release_date) : undefined,
       tmdbRating: elm.vote_average,
     }));
   }
@@ -66,6 +66,7 @@ export default class TMDBAPI {
   static useIMDBSearch = async (movieName: string): Promise<MovieProp | undefined> => {
     const results = await IMDBAPI.searchTitle(movieName);
     if (results) {
+      console.log(results[0]);
       return await this.findMovie(results[0]);
     } else {
       return undefined;
