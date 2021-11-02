@@ -1,8 +1,7 @@
 import type Database from 'better-sqlite3';
 import { contextBridge, ipcRenderer } from 'electron';
 import fs from 'original-fs';
-import { join } from 'path';
-import FileNode, { DBNode, UpdateType } from './fileNode';
+import type { DBNode, UpdateType } from './fileNode';
 
 const readDir = (path: string) => {
   const dirents = fs.readdirSync(path, { withFileTypes: true });
@@ -29,43 +28,6 @@ const statSync = (path: string) => {
 
 const existSync = (path: string) => fs.existsSync(path);
 
-const readSingleFileNode = (path: string) => {
-  const stat = statSync(path);
-  const newNode = new FileNode({
-    fullPath: path,
-    blocks: stat.blocks,
-    blksize: stat.blksize,
-    size: stat.size,
-  });
-  return newNode;
-}
-
-const readFileNodes = (path: string): FileNode[] => {
-  const dirs = readDir(path);
-  let nodes: FileNode[] = [];
-  dirs.forEach(dir => {
-    if (dir.isDirectory) {
-      const subPath = join(path, dir.name);
-      const newNodes = readFileNodes(subPath);
-      nodes.push(...newNodes);
-    } else {
-      const fullPath = join(path, dir.name);
-      const newNode = readSingleFileNode(fullPath);
-      nodes.push(newNode);
-    }
-  });
-  return nodes;
-}
-
-const initFileNodes = (path: string) => {
-  const stat = fs.statSync(path);
-  if (stat.isDirectory()) {
-    return readFileNodes(path);
-  } else {
-    throw new Error(`${path} is not a directory`);
-  }
-}
-
 const addLitsener = (path: string, listener: (filename: string) => void) => {
   fs.watch(path, { recursive: true }, (event, filename) => {
     if (event === 'rename') {
@@ -75,9 +37,9 @@ const addLitsener = (path: string, listener: (filename: string) => void) => {
 }
 
 const fsAPI = {
+  readDir: readDir,
+  statSync: statSync,
   existSync: existSync,
-  readSingleFileNode: readSingleFileNode,
-  initFileNodes: initFileNodes,
   addLitsener: addLitsener,
 };
 

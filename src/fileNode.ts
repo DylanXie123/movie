@@ -50,4 +50,31 @@ export default class FileNode {
   get diskSize() {
     return this.blocks * this.blksize;
   }
+
+  /**
+   * "w92",
+   * "w154",
+   * "w185",
+   * "w342",
+   * "w500",
+   * "w780",
+   * "original"
+   */
+  get posterURL() {
+    return this.movie ?
+      "https://image.tmdb.org/t/p/original" + this.movie.posterURL :
+      undefined;
+  }
+
+  /**
+   * "w300",
+   * "w780",
+   * "w1280",
+   * "original"
+   */
+  get backgroundURL() {
+    return this.movie ?
+      "https://image.tmdb.org/t/p/original" + this.movie.backgroundURL :
+      undefined;
+  }
 }

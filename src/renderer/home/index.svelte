@@ -2,24 +2,12 @@
   import fileNodeStore from "../store/fileNodeStore";
 </script>
 
-<ul>
-  {#each $fileNodeStore as node}
-    <li>{node.parsed.base}</li>
-  {/each}
-</ul>
-
 <p>Home Page</p>
 
 <div class="container">
-  <img src="https://via.placeholder.com/150" alt="movie" />
-  <img src="https://via.placeholder.com/150" alt="movie" />
-  <img src="https://via.placeholder.com/150" alt="movie" />
-  <img src="https://via.placeholder.com/150" alt="movie" />
-  <img src="https://via.placeholder.com/150" alt="movie" />
-  <img src="https://via.placeholder.com/150" alt="movie" />
-  <img src="https://via.placeholder.com/150" alt="movie" />
-  <img src="https://via.placeholder.com/150" alt="movie" />
-  <img src="https://via.placeholder.com/150" alt="movie" />
+  {#each $fileNodeStore as node}
+    <img src={node.posterURL} alt={node.parsed.name} />
+  {/each}
 </div>
 
 <style>
