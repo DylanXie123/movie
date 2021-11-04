@@ -1,7 +1,8 @@
 import { writable } from "svelte/store";
-import initFileNodes, { addLitsener, appendMovie, validateNode } from "./utils";
+import type { MovieProp } from "../../fileNode";
+import initFileNodes, { addLitsener, appendMovie, convertToDB, validateNode } from "./utils";
 
-const path = "D:\\OneDrive - stu.xjtu.edu.cn\\Media\\Movies\\Amour (2012) [1080p] [BluRay] [5.1] [YTS.MX]";
+const path = "D:\\OneDrive - stu.xjtu.edu.cn\\Media\\Movies\\Marvel";
 
 const init = () => {
   const fileNodes = initFileNodes(path);
@@ -12,11 +13,23 @@ function createFileNodeStore() {
   const fileNodes = init();
   const { subscribe, set, update } = writable(fileNodes);
 
+  const updateNode = async (movieProp: MovieProp, fullPath: string) => {
+    update(oldNodes => {
+      const index = oldNodes.findIndex(node => node.fullPath === fullPath);
+      console.log(movieProp);
+      oldNodes[index].movie = movieProp;
+      return oldNodes;
+    });
+    const dbNode = convertToDB(movieProp, fullPath);
+    return await window.dbAPI.update(dbNode);
+  }
+
   appendMovie(fileNodes).then(newNodes => set(newNodes));
   addLitsener(path, update);
 
   return {
     subscribe,
+    updateNode: updateNode,
   };
 }
 

@@ -45,6 +45,20 @@ export const validateNode = (fileNode: FileNode) => {
   return format.test(fileNode.parsed.ext);
 }
 
+export const convertToDB = (movie: MovieProp, fulllPath: string): DBNode => ({
+  fullPath: fulllPath,
+  title: movie.title,
+  tmdbID: movie.tmdbID,
+  imdbID: movie.imdbID,
+  posterURL: movie.posterURL,
+  backgroundURL: movie.backgroundURL,
+  overview: movie.overview,
+  language: movie.language,
+  releaseDate: movie.releaseDate ? movie.releaseDate.toDateString() : undefined,
+  tmdbRating: movie.tmdbRating,
+  imdbRating: movie.imdbRating,
+});
+
 export const appendMovie = async (fileNodes: FileNode[]) => {
   const convertFromDB = (movie: DBNode): MovieProp => ({
     title: movie.title,
@@ -55,20 +69,6 @@ export const appendMovie = async (fileNodes: FileNode[]) => {
     overview: movie.overview,
     language: movie.language,
     releaseDate: movie.releaseDate ? new Date(movie.releaseDate) : undefined,
-    tmdbRating: movie.tmdbRating,
-    imdbRating: movie.imdbRating,
-  });
-
-  const convertToDB = (movie: MovieProp, fulllPath: string): DBNode => ({
-    fullPath: fulllPath,
-    title: movie.title,
-    tmdbID: movie.tmdbID,
-    imdbID: movie.imdbID,
-    posterURL: movie.posterURL,
-    backgroundURL: movie.backgroundURL,
-    overview: movie.overview,
-    language: movie.language,
-    releaseDate: movie.releaseDate ? movie.releaseDate.toDateString() : undefined,
     tmdbRating: movie.tmdbRating,
     imdbRating: movie.imdbRating,
   });

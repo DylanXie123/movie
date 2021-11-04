@@ -45,22 +45,13 @@ export default class TMDBAPI {
   }
 
   static searchMovie = async (movieName: string): Promise<MovieProp[]> => {
-    const url = new URL('3/search/company', this.baseURL);
+    const url = new URL('3/search/movie', this.baseURL);
     url.searchParams.append('query', movieName);
     const response = await authFetch(url);
     const json = await response.json();
     const elms = json.results as [];
-    return elms.map((elm: any) => ({
-      title: elm.title,
-      tmdbID: elm.id,
-      imdbID: elm.imdb_id,
-      posterURL: elm.poster_path,
-      backgroundURL: elm.backdrop_path,
-      overview: elm.overview,
-      language: elm.original_language,
-      releaseDate: elm.release_date ? new Date(elm.release_date) : undefined,
-      tmdbRating: elm.vote_average,
-    }));
+    const ids = elms.map((elm: any) => elm.id as string);
+    return await Promise.all(ids.map(id => this.movies(id)));
   }
 
   static useIMDBSearch = async (movieName: string): Promise<MovieProp | undefined> => {
