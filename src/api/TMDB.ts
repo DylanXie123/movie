@@ -11,7 +11,7 @@ export default class TMDBAPI {
     return {
       title: json.title,
       tmdbID: json.id,
-      imdbID: json.imdb_id,
+      imdbID: parseInt(json.imdb_id.slice(2)),
       posterURL: json.poster_path,
       backgroundURL: json.backdrop_path,
       overview: json.overview,
@@ -57,7 +57,6 @@ export default class TMDBAPI {
   static useIMDBSearch = async (movieName: string): Promise<MovieProp | undefined> => {
     const results = await IMDBAPI.searchTitle(movieName);
     if (results) {
-      console.log(results[0]);
       return await this.findMovie(results[0]);
     } else {
       return undefined;

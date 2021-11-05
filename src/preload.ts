@@ -50,7 +50,7 @@ const api_key = {
 
 const dbAPI = {
   create: (item: DBNode) => ipcRenderer.invoke('create', item) as Promise<Database.RunResult>,
-  retrieve: (fullPath: string) => ipcRenderer.invoke('retrieve', fullPath) as Promise<DBNode>,
+  retrieve: (fileName: string) => ipcRenderer.invoke('retrieve', fileName) as Promise<DBNode>,
   update: (newData: UpdateType) => ipcRenderer.invoke('update', newData) as Promise<Database.RunResult>,
   delete: (fulllPath: string) => ipcRenderer.invoke('delete', fulllPath) as Promise<Database.RunResult>,
   retrieveAll: () => ipcRenderer.invoke('retrieveAll') as Promise<DBNode[]>,

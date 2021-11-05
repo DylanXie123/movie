@@ -12,7 +12,7 @@
     results = [];
   };
 
-  const savetoDB = (movie: MovieProp, fullPath: string) =>
+  const updateStore = (movie: MovieProp, fullPath: string) =>
     fileNodeStore.updateNode(movie, fullPath);
 
   export let node: FileNode;
@@ -29,7 +29,7 @@
     <div class="list-group">
       {#each results as movie}
         <button
-          on:click={() => savetoDB(movie, node.fullPath)}
+          on:click={() => updateStore(movie, node.fullPath)}
           class="list-group-item list-group-item-action"
         >
           {movie.title}

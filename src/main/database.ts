@@ -19,7 +19,7 @@ const db = connectToDatabase();
 export const initDatabase = () => {
   return db.prepare(`
     CREATE TABLE IF NOT EXISTS Movie (
-      fullPath	TEXT NOT NULL UNIQUE,
+      fileName	TEXT NOT NULL UNIQUE,
       title	TEXT NOT NULL,
       tmdbID	INTEGER NOT NULL,
       imdbID	INTEGER NOT NULL,
@@ -30,7 +30,7 @@ export const initDatabase = () => {
       releaseDate	TEXT,
       tmdbRating	NUMERIC,
       imdbRating	NUMERIC,
-      PRIMARY KEY("fullPath")
+      PRIMARY KEY("fileName")
     )
   `).run();
 }
@@ -38,7 +38,7 @@ export const initDatabase = () => {
 export const create = (item: DBNode) => {
   const insert = db.prepare(`
     INSERT INTO Movie VALUES 
-    (@fullPath, @title, @tmdbID, @imdbID, @posterURL, @backgroundURL, 
+    (@fileName, @title, @tmdbID, @imdbID, @posterURL, @backgroundURL, 
       @overview, @language, @releaseDate, @tmdbRating, @imdbRating)
   `);
   return insert.run(item);
@@ -50,13 +50,13 @@ export const update = (newData: UpdateType) => {
     query = query + `, ${key} = @${key}`;
   }
   query = query.slice(2);
-  const updateItem = db.prepare(`UPDATE Movie SET ${query} WHERE fullPath = @fullPath`);
+  const updateItem = db.prepare(`UPDATE Movie SET ${query} WHERE fileName = @fileName`);
   return updateItem.run(newData);
 }
 
-export const retrieve = (fullPath: string) => {
-  const selectItem = db.prepare(`SELECT * FROM Movie WHERE fullPath = @fullPath`);
-  return selectItem.all({ fullPath });
+export const retrieve = (fileName: string) => {
+  const selectItem = db.prepare(`SELECT * FROM Movie WHERE fileName = @fileName`);
+  return selectItem.all({ fileName });
 }
 
 export const retrieveAll = () => {
@@ -65,9 +65,9 @@ export const retrieveAll = () => {
   return result;
 }
 
-export const deleteDB = (fullPath: string) => {
-  const del = db.prepare(`DELETE FROM Movie WHERE fullPath = @fullPath`);
-  return del.run({ fullPath });
+export const deleteDB = (fileName: string) => {
+  const del = db.prepare(`DELETE FROM Movie WHERE fileName = @fileName`);
+  return del.run({ fileName });
 }
 
 export const closeDB = () => {

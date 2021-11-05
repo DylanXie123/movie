@@ -64,12 +64,12 @@ ipcMain.handle('update', (_event, newData: UpdateType) => {
   return update(newData);
 })
 
-ipcMain.handle('retrieve', (_event, fulllPath: string) => {
-  return retrieve(fulllPath);
+ipcMain.handle('retrieve', (_event, fileName: string) => {
+  return retrieve(fileName);
 })
 
-ipcMain.handle('delete', (_event, fulllPath: string) => {
-  return deleteDB(fulllPath);
+ipcMain.handle('delete', (_event, fileName: string) => {
+  return deleteDB(fileName);
 })
 
 ipcMain.handle('retrieveAll', (_event) => {

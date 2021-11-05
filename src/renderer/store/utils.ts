@@ -45,8 +45,8 @@ export const validateNode = (fileNode: FileNode) => {
   return format.test(fileNode.parsed.ext);
 }
 
-export const convertToDB = (movie: MovieProp, fulllPath: string): DBNode => ({
-  fullPath: fulllPath,
+export const convertToDB = (movie: MovieProp, fileName: string): DBNode => ({
+  fileName: fileName,
   title: movie.title,
   tmdbID: movie.tmdbID,
   imdbID: movie.imdbID,
@@ -80,14 +80,19 @@ export const appendMovie = async (fileNodes: FileNode[]) => {
    * if file not exist, request data from TMDB API
    */
   const moviePromise = fileNodes.map(async node => {
-    const movie = moviesDB.find(item => item.fullPath === node.fullPath);
+    const movie = moviesDB.find(item => item.fileName === node.parsed.name);
     if (movie) {
       node.movie = convertFromDB(movie);
     } else {
-      const movieInfo = await TMDBAPI.useIMDBSearch(node.parsed.name);
+      /**
+       * IMDB API can't handle chinese input
+       * need to remove chinese input before request
+       */
+      const query = node.parsed.name.replace(/[^\x00-\x7F]/g, "");
+      const movieInfo = await TMDBAPI.useIMDBSearch(query);
       node.movie = movieInfo;
       if (movieInfo) {
-        const dbNode = convertToDB(movieInfo, node.fullPath);
+        const dbNode = convertToDB(movieInfo, node.parsed.name);
         window.dbAPI.create(dbNode);
       }
     }
@@ -112,17 +117,14 @@ export const addLitsener = (path: string, updater: (this: void, updater: Updater
     if (exist) {
       const newNode = readSingleFileNode(changedPath);
       if (validateNode(newNode)) {
-        console.log(newNode);
         updater(oldNodes => {
           oldNodes.push(newNode);
           return oldNodes;
         });
       }
     } else {
-      console.log(changedPath);
       updater(oldNodes => oldNodes.filter(node => node.fullPath !== changedPath));
     }
   });
-
 
 export default initFileNodes;
