@@ -84,15 +84,10 @@ export const appendMovie = async (fileNodes: FileNode[]) => {
     if (movie) {
       node.movie = convertFromDB(movie);
     } else {
-      /**
-       * IMDB API can't handle chinese input
-       * need to remove chinese input before request
-       */
-      const query = node.parsed.name.replace(/[^\x00-\x7F]/g, "");
-      const movieInfo = await TMDBAPI.useIMDBSearch(query);
-      node.movie = movieInfo;
-      if (movieInfo) {
-        const dbNode = convertToDB(movieInfo, node.parsed.name);
+      const movieInfo = await TMDBAPI.searchMovie(node.parsed.name);
+      node.movie = movieInfo[0];
+      if (movieInfo && movieInfo.length && movieInfo.length > 0) {
+        const dbNode = convertToDB(movieInfo[0], node.parsed.name);
         window.dbAPI.create(dbNode);
       }
     }
