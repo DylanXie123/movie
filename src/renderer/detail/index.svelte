@@ -6,6 +6,8 @@
 
   // TODO: maybe this should be a promise?
   $: movieNode = $fileNodeStore.find((node) => node.movie?.tmdbID === tmdbID);
+
+  const openFile = () => window.fsAPI.openFile(movieNode?.fullPath!);
 </script>
 
 <div class="header" style="--background-image: url({movieNode?.backgroundURL})">
@@ -15,6 +17,13 @@
   <div class="info">
     <h1>{movieNode?.movie?.title}</h1>
     <p>{movieNode?.movie?.overview}</p>
+    <button class="btn btn-primary" on:click={openFile}>
+      {#if movieNode?.onDisk}
+        <i class="bi bi-play-btn" />
+      {:else}
+        <i class="bi bi-x-octagon" />
+      {/if}
+    </button>
   </div>
 </div>
 

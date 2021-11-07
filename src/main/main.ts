@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import Store from 'electron-store';
 import type { DBNode, UpdateType } from '../fileNode';
 import { closeDB, create, deleteDB, initDatabase, retrieve, retrieveAll, update } from './database';
@@ -74,4 +74,8 @@ ipcMain.handle('delete', (_event, fileName: string) => {
 
 ipcMain.handle('retrieveAll', (_event) => {
   return retrieveAll();
+})
+
+ipcMain.handle('openFile', async (_event, fullPath: string) => {
+  return await shell.openPath(fullPath);
 })

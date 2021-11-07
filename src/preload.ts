@@ -36,11 +36,16 @@ const addLitsener = (path: string, listener: (filename: string) => void) => {
   });
 }
 
+const openFile = (fullPath: string) => {
+  return ipcRenderer.invoke('openFile', fullPath) as Promise<string>;
+};
+
 const fsAPI = {
   readDir: readDir,
   statSync: statSync,
   existSync: existSync,
   addLitsener: addLitsener,
+  openFile: openFile,
 };
 
 const api_key = {

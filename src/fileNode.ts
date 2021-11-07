@@ -44,7 +44,7 @@ export default class FileNode {
 
 
   get onDisk() {
-    return this.blocks === 0;
+    return !(this.blocks === 0);
   }
 
   get diskSize() {
