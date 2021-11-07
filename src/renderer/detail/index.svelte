@@ -1,23 +1,20 @@
 <script lang="ts">
+  import fileNodeStore from "../store/fileNodeStore";
+
+  export let params: Record<string, string> = {};
+  const tmdbID = parseInt(params.id);
+
+  // TODO: maybe this should be a promise?
+  $: movieNode = $fileNodeStore.find((node) => node.movie?.tmdbID === tmdbID);
 </script>
 
-<div class="header">
+<div class="header" style="--background-image: url({movieNode?.backgroundURL})">
   <div class="poster">
-    <img
-      src="https://image.tmdb.org/t/p/w500/a26cQPRhJPX6GbWfQbvZdrrp9j9.jpg"
-      alt="poster"
-    />
+    <img src={movieNode?.posterURL} alt="poster" />
   </div>
   <div class="info">
-    <h1>Fight Club</h1>
-    <p>
-      When an engineer learns of a mysterious, impenetrable fortress hidden
-      under The Bank of Spain, he joins a crew of master thieves who plan to
-      steal the legendary lost treasure locked inside while the whole country is
-      distracted by Spain's World Cup Final. With thousands of soccer fans
-      cheering in the streets, and security forces closing in, the crew have
-      just minutes to pull off the score of a lifetime.
-    </p>
+    <h1>{movieNode?.movie?.title}</h1>
+    <p>{movieNode?.movie?.overview}</p>
   </div>
 </div>
 
@@ -36,7 +33,7 @@
         rgba(0, 0, 255, 0.5),
         rgba(255, 255, 0, 0.5)
       ),
-      url("https://image.tmdb.org/t/p/w500/3nv2TEz2u178xPXzdKlZdUh5uOI.jpg");
+      var(--background-image);
     background-size: cover;
     background-position: center;
     width: 100%;

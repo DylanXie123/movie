@@ -1,5 +1,6 @@
 <script lang="ts">
   export let src: string | undefined;
+  export let path: string | undefined;
   export let alt = "poster";
 
   enum Status {
@@ -26,7 +27,9 @@
 {:else if status === Status.Error}
   <i class="bi bi-x-circle-fill" />
 {/if}
-<img on:load={onComplete} on:error={onError} {src} {alt} {hidden} />
+<a href={path ? `#/detail/${path}` : undefined}>
+  <img on:load={onComplete} on:error={onError} {src} {alt} {hidden} />
+</a>
 
 <style>
   img {

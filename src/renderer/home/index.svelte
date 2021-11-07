@@ -8,7 +8,11 @@
 <div class="grid-container">
   {#each $fileNodeStore as node}
     <div class="d-grid gap-2">
-      <Image src={node.posterURL} alt={node.parsed.name} />
+      <Image
+        src={node.posterURL}
+        alt={node.parsed.name}
+        path={node.movie?.tmdbID.toString()}
+      />
       <SearchBox {node} />
     </div>
   {/each}
