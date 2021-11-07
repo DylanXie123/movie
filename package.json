@@ -57,15 +57,7 @@
                   "preload": {
                     "js": "./src/preload.ts"
                   },
-                  "name": "index"
-                },
-                {
-                  "html": "./src/renderer/index.html",
-                  "js": "./src/renderer/renderer.ts",
-                  "preload": {
-                    "js": "./src/preload.ts"
-                  },
-                  "name": "detail"
+                  "name": "main_window"
                 }
               ]
             }
@@ -103,6 +95,6 @@
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.0.1",
     "path-browserify": "^1.0.1",
-    "svelte-routing": "^1.6.0"
+    "svelte-spa-router": "^3.2.0"
   }
 }

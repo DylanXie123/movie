@@ -3,8 +3,8 @@ import Store from 'electron-store';
 import type { DBNode, UpdateType } from '../fileNode';
 import { closeDB, create, deleteDB, initDatabase, retrieve, retrieveAll, update } from './database';
 
-declare const INDEX_WEBPACK_ENTRY: string;
-declare const INDEX_PRELOAD_WEBPACK_ENTRY: string;
+declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
+declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -18,12 +18,12 @@ const createWindow = () => {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: INDEX_PRELOAD_WEBPACK_ENTRY,
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     }
   });
 
   // and load the index.html of the app.
-  mainWindow.loadURL(INDEX_WEBPACK_ENTRY);
+  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
