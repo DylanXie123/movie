@@ -1,6 +1,10 @@
 import Database from 'better-sqlite3';
 import { app } from 'electron';
-import type { DBNode, UpdateType } from '../fileNode';
+import type { MovieProp } from '../fileNode';
+
+export type MovieDBData = Omit<MovieProp, "releaseDate"> & { fileName: string, releaseDate?: string };
+
+export type MocieDBUpdate = Partial<MovieDBData> & { fileName: string };
 
 const connectToDatabase = () => {
   // If in debug mode, files will be saved to the root directory of the repository.
@@ -9,14 +13,14 @@ const connectToDatabase = () => {
     const db = new Database('Movie.db');
     return db;
   } else {
-    const db = new Database(app.getPath('userData') + '\\user\\Movie.db');
+    const db = new Database(app.getPath('userData') + '/user/Movie.db');
     return db;
   }
 }
 
 const db = connectToDatabase();
 
-export const initDatabase = () => {
+const initDatabase = () => {
   return db.prepare(`
     CREATE TABLE IF NOT EXISTS Movie (
       fileName	TEXT NOT NULL UNIQUE,
@@ -35,7 +39,7 @@ export const initDatabase = () => {
   `).run();
 }
 
-export const create = (item: DBNode) => {
+const create = (item: MovieDBData) => {
   const insert = db.prepare(`
     INSERT INTO Movie VALUES 
     (@fileName, @title, @tmdbID, @imdbID, @posterURL, @backgroundURL, 
@@ -44,7 +48,7 @@ export const create = (item: DBNode) => {
   return insert.run(item);
 }
 
-export const update = (newData: UpdateType) => {
+const update = (newData: MocieDBUpdate) => {
   let query = '';
   for (const key in newData) {
     query = query + `, ${key} = @${key}`;
@@ -54,22 +58,34 @@ export const update = (newData: UpdateType) => {
   return updateItem.run(newData);
 }
 
-export const retrieve = (fileName: string) => {
+const retrieve = (fileName: string) => {
   const selectItem = db.prepare(`SELECT * FROM Movie WHERE fileName = @fileName`);
   return selectItem.all({ fileName });
 }
 
-export const retrieveAll = () => {
+const retrieveAll = () => {
   const retrieve = db.prepare(`SELECT * FROM Movie`);
   const result = retrieve.all();
   return result;
 }
 
-export const deleteDB = (fileName: string) => {
+const deleteDB = (fileName: string) => {
   const del = db.prepare(`DELETE FROM Movie WHERE fileName = @fileName`);
   return del.run({ fileName });
 }
 
-export const closeDB = () => {
+const closeDB = () => {
   return db.close();
 }
+
+const MovieDB = {
+  initDatabase: initDatabase,
+  create: create,
+  update: update,
+  retrieve: retrieve,
+  retrieveAll: retrieveAll,
+  deleteDB: deleteDB,
+  closeDB: closeDB,
+}
+
+export default MovieDB;

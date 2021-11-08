@@ -21,10 +21,6 @@ export interface MovieProp {
   imdbRating?: number;
 }
 
-export type DBNode = Omit<MovieProp, "releaseDate"> & { fileName: string, releaseDate?: string };
-
-export type UpdateType = Partial<Omit<DBNode, "fileName">> & { fileName: string };
-
 export default class FileNode {
   constructor(props: FileNodeProp) {
     this.fullPath = props.fullPath;

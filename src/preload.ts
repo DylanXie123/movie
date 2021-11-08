@@ -1,7 +1,8 @@
 import type Database from 'better-sqlite3';
 import { contextBridge, ipcRenderer } from 'electron';
 import fs from 'original-fs';
-import type { DBNode, UpdateType } from './fileNode';
+import type { IgnoreData } from './main/ignoreDB';
+import type { MovieDBData, MocieDBUpdate } from './main/movieDB';
 
 const readDir = (path: string) => {
   const dirents = fs.readdirSync(path, { withFileTypes: true });
@@ -53,23 +54,33 @@ const api_key = {
   IMDB: process.env.IMDB_API_KEY!,
 };
 
-const dbAPI = {
-  create: (item: DBNode) => ipcRenderer.invoke('create', item) as Promise<Database.RunResult>,
-  retrieve: (fileName: string) => ipcRenderer.invoke('retrieve', fileName) as Promise<DBNode>,
-  update: (newData: UpdateType) => ipcRenderer.invoke('update', newData) as Promise<Database.RunResult>,
-  delete: (fulllPath: string) => ipcRenderer.invoke('delete', fulllPath) as Promise<Database.RunResult>,
-  retrieveAll: () => ipcRenderer.invoke('retrieveAll') as Promise<DBNode[]>,
+const movieDBAPI = {
+  create: (item: MovieDBData) => ipcRenderer.invoke('movieDBCreate', item) as Promise<Database.RunResult>,
+  retrieve: (fileName: string) => ipcRenderer.invoke('movieDBRetrieve', fileName) as Promise<MovieDBData>,
+  update: (newData: MocieDBUpdate) => ipcRenderer.invoke('movieDBUpdate', newData) as Promise<Database.RunResult>,
+  delete: (fileName: string) => ipcRenderer.invoke('movieDBDelete', fileName) as Promise<Database.RunResult>,
+  retrieveAll: () => ipcRenderer.invoke('movieDBRetrieveAll') as Promise<MovieDBData[]>,
+};
+
+const ignoreDBAPI = {
+  create: (item: IgnoreData) => ipcRenderer.invoke('ignoreDBCreate', item) as Promise<Database.RunResult>,
+  retrieve: (fullPath: string) => ipcRenderer.invoke('ignoreDBRetrieve', fullPath) as Promise<MovieDBData>,
+  update: (newData: IgnoreData) => ipcRenderer.invoke('ignoreDBUpdate', newData) as Promise<Database.RunResult>,
+  delete: (fulllPath: string) => ipcRenderer.invoke('ignoreDBDelete', fulllPath) as Promise<Database.RunResult>,
+  retrieveAll: () => ipcRenderer.invoke('ignoreDBRetrieveAll') as Promise<IgnoreData[]>,
 };
 
 contextBridge.exposeInMainWorld('fsAPI', fsAPI);
 contextBridge.exposeInMainWorld('api_key', api_key);
-contextBridge.exposeInMainWorld('dbAPI', dbAPI);
+contextBridge.exposeInMainWorld('movieDBAPI', movieDBAPI);
+contextBridge.exposeInMainWorld('ignoreDBAPI', ignoreDBAPI);
 
 declare global {
   interface Window {
     fsAPI: typeof fsAPI;
     api_key: typeof api_key;
-    dbAPI: typeof dbAPI;
+    movieDBAPI: typeof movieDBAPI;
+    ignoreDBAPI: typeof ignoreDBAPI;
   }
 }
 

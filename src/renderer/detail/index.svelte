@@ -4,8 +4,7 @@
   export let params: Record<string, string> = {};
   const tmdbID = parseInt(params.id);
 
-  // TODO: maybe this should be a promise?
-  $: movieNode = $fileNodeStore.find((node) => node.movie?.tmdbID === tmdbID);
+  $: movieNode = $fileNodeStore.find((node) => node.movie?.tmdbID === tmdbID)!;
 
   const openFile = () => window.fsAPI.openFile(movieNode?.fullPath!);
 </script>

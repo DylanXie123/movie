@@ -13,6 +13,7 @@
         alt={node.parsed.name}
         path={node.movie?.tmdbID.toString()}
       />
+      <button class="btn btn-primary">Ignore</button>
       <SearchBox {node} />
     </div>
   {/each}

@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import Store from 'electron-store';
-import type { DBNode, UpdateType } from '../fileNode';
-import { closeDB, create, deleteDB, initDatabase, retrieve, retrieveAll, update } from './database';
+import IgnoreDB, { IgnoreData } from './ignoreDB';
+import MovieDB, { MovieDBData, MocieDBUpdate } from './movieDB';
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -12,7 +12,8 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 }
 
 const createWindow = () => {
-  initDatabase();
+  MovieDB.initDatabase();
+  IgnoreDB.initDatabase();
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
@@ -41,7 +42,8 @@ app.on('ready', createWindow);
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    closeDB();
+    MovieDB.closeDB();
+    IgnoreDB.closeDB();
     app.quit();
   }
 });
@@ -54,28 +56,48 @@ app.on('activate', () => {
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
-ipcMain.handle('create', (_event, item: DBNode) => {
-  return create(item);
-})
-
-ipcMain.handle('update', (_event, newData: UpdateType) => {
-  return update(newData);
-})
-
-ipcMain.handle('retrieve', (_event, fileName: string) => {
-  return retrieve(fileName);
-})
-
-ipcMain.handle('delete', (_event, fileName: string) => {
-  return deleteDB(fileName);
-})
-
-ipcMain.handle('retrieveAll', (_event) => {
-  return retrieveAll();
-})
-
 ipcMain.handle('openFile', async (_event, fullPath: string) => {
   return await shell.openPath(fullPath);
+})
+
+// MovieDB related events
+ipcMain.handle('movieDBCreate', (_event, item: MovieDBData) => {
+  return MovieDB.create(item);
+})
+
+ipcMain.handle('movieDBUpdate', (_event, newData: MocieDBUpdate) => {
+  return MovieDB.update(newData);
+})
+
+ipcMain.handle('movieDBRetrieve', (_event, fileName: string) => {
+  return MovieDB.retrieve(fileName);
+})
+
+ipcMain.handle('movieDBDelete', (_event, fileName: string) => {
+  return MovieDB.deleteDB(fileName);
+})
+
+ipcMain.handle('movieDBRetrieveAll', (_event) => {
+  return MovieDB.retrieveAll();
+})
+
+// IgnoreDB related events
+ipcMain.handle('ignoreDBCreate', (_event, item: IgnoreData) => {
+  return IgnoreDB.create(item);
+})
+
+ipcMain.handle('ignoreDBUpdate', (_event, newData: IgnoreData) => {
+  return IgnoreDB.update(newData);
+})
+
+ipcMain.handle('ignoreDBRetrieve', (_event, fullPath: string) => {
+  return IgnoreDB.retrieve(fullPath);
+})
+
+ipcMain.handle('ignoreDBDelete', (_event, fullPath: string) => {
+  return IgnoreDB.deleteDB(fullPath);
+})
+
+ipcMain.handle('ignoreDBRetrieveAll', (_event) => {
+  return IgnoreDB.retrieveAll();
 })
