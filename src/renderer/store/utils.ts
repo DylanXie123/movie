@@ -110,17 +110,19 @@ export const appendMovie = async (fileNodes: FileNode[]) => {
 export const addLitsener = (path: string, ignoreList: IgnoreData[], updater: (this: void, updater: Updater<FileNode[]>) => void) =>
   window.fsAPI.addLitsener(path, (fileName) => {
     const changedPath = join(path, fileName);
-    const exist = window.fsAPI.existSync(changedPath);
-    if (exist) {
-      const newNode = readSingleFileNode(changedPath);
-      if (validateNode(newNode)) {
-        updater(oldNodes => {
-          oldNodes.push(newNode);
-          return oldNodes;
-        });
+    if (!ignoreList.find(ignore => ignore.fullPath === changedPath)) {
+      const exist = window.fsAPI.existSync(changedPath);
+      if (exist) {
+        const newNode = readSingleFileNode(changedPath);
+        if (validateNode(newNode)) {
+          updater(oldNodes => {
+            oldNodes.push(newNode);
+            return oldNodes;
+          });
+        }
+      } else {
+        updater(oldNodes => oldNodes.filter(node => node.fullPath !== changedPath));
       }
-    } else {
-      updater(oldNodes => oldNodes.filter(node => node.fullPath !== changedPath));
     }
   });
 
