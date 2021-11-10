@@ -28,11 +28,12 @@
   <i class="bi bi-x-circle-fill" />
 {/if}
 <a href={path ? `#/detail/${path}` : undefined}>
-  <img on:load={onComplete} on:error={onError} {src} {alt} {hidden} />
+  <img
+    on:load={onComplete}
+    on:error={onError}
+    class="img-fluid"
+    {src}
+    {alt}
+    {hidden}
+  />
 </a>
-
-<style>
-  img {
-    max-width: 100%;
-  }
-</style>

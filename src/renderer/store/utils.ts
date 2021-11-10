@@ -1,9 +1,7 @@
 import FileNode, { MovieProp } from "../../fileNode";
 import { join } from 'path';
 import TMDBAPI from "../../api/TMDB";
-import type { Updater } from "svelte/types/runtime/store";
 import type { MovieDBData } from "../../main/movieDB";
-import type { IgnoreData } from "../../main/ignoreDB";
 
 export const readSingleFileNode = (path: string) => {
   const stat = window.fsAPI.statSync(path);
@@ -99,32 +97,6 @@ export const appendMovie = async (fileNodes: FileNode[]) => {
   return await Promise.all(moviePromise);
 }
 
-/**
- * litsen to `rename` event, which will emit whenever a filename appears or disappears in the directory.
- * 
- * https://nodejs.org/api/fs.html#fswatchfilename-options-listener
- * 
- * when change happende, check if directory exists, if exists, create new fileNode, if not, delete original fileNode
- * @param updater update method to update fileNodes
- */
-export const addLitsener = (path: string, ignoreList: IgnoreData[], updater: (this: void, updater: Updater<FileNode[]>) => void) =>
-  window.fsAPI.addLitsener(path, (fileName) => {
-    const changedPath = join(path, fileName);
-    if (!ignoreList.find(ignore => ignore.fullPath === changedPath)) {
-      const exist = window.fsAPI.existSync(changedPath);
-      if (exist) {
-        const newNode = readSingleFileNode(changedPath);
-        if (validateNode(newNode)) {
-          updater(oldNodes => {
-            oldNodes.push(newNode);
-            return oldNodes;
-          });
-        }
-      } else {
-        updater(oldNodes => oldNodes.filter(node => node.fullPath !== changedPath));
-      }
-    }
-  });
 
 export const initIgnoreDB = async () => await window.ignoreDBAPI.retrieveAll();
 
