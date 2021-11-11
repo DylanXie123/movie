@@ -17,14 +17,18 @@
 </script>
 
 <div class="container">
-  <ul class="list-group">
-    {#each ignoreList as ignore}
-      <li class="list-group-item">
-        {ignore.fullPath}
-        <button class="btn btn-primary" on:click={() => restore(ignore)}>
-          Restore
-        </button>
-      </li>
-    {/each}
-  </ul>
+  {#if ignoreList.length === 0}
+    <p>Empty Ignore List</p>
+  {:else}
+    <ul class="list-group">
+      {#each ignoreList as ignore (ignore.fullPath)}
+        <li class="list-group-item">
+          {ignore.fullPath}
+          <button class="btn btn-primary" on:click={() => restore(ignore)}>
+            Restore
+          </button>
+        </li>
+      {/each}
+    </ul>
+  {/if}
 </div>

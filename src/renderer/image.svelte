@@ -31,7 +31,7 @@
   <img
     on:load={onComplete}
     on:error={onError}
-    class="img-fluid"
+    class="img-fluid shadow rounded"
     {src}
     {alt}
     {hidden}

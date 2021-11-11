@@ -18,24 +18,18 @@
 <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2">
   <div class="position-relative">
     <div class="position-absolute top-0 end-0">
-      <div class="dropdown">
-        <button
-          class="btn btn-outline-dark rounded-circle"
-          type="button"
-          on:click={toggleEdit}
-        >
-          <i class="bi bi-three-dots" />
-        </button>
-      </div>
+      <button class="btn btn-primary " on:click={toggleEdit}>
+        <i class="bi bi-three-dots" />
+      </button>
     </div>
+    <Image
+      src={node.posterURL}
+      alt={node.movie?.title}
+      path={node.movie?.tmdbID.toString()}
+    />
   </div>
-  <Image
-    src={node.posterURL}
-    alt={node.parsed.name}
-    path={node.movie?.tmdbID.toString()}
-  />
   {#if showEdit}
     <SearchBox {node} />
-    <button class="btn btn-primary" on:click={addIgnore}>AddToIgnore</button>
+    <button class="btn btn-primary" on:click={addIgnore}>Ignore</button>
   {/if}
 </div>

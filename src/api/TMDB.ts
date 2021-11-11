@@ -8,10 +8,11 @@ export default class TMDBAPI {
     const url = new URL(`3/movie/${movie_id}`, this.baseURL);
     const response = await authFetch(url);
     const json = await response.json();
+    const imdbID = json.imdb_id ? parseInt(json.imdb_id.slice(2)) : json.imdb_id;
     return {
       title: json.title,
       tmdbID: json.id,
-      imdbID: parseInt(json.imdb_id.slice(2)),
+      imdbID: imdbID,
       posterURL: json.poster_path,
       backgroundURL: json.backdrop_path,
       overview: json.overview,
@@ -26,12 +27,13 @@ export default class TMDBAPI {
     url.searchParams.append('external_source', 'imdb_id');
     const response = await authFetch(url);
     const json = await response.json();
+    const imdbID = json.imdb_id ? parseInt(json.imdb_id.slice(2)) : json.imdb_id;
     try {
       const elm = json.movie_results[0];
       return {
         title: elm.title,
         tmdbID: elm.id,
-        imdbID: parseInt(external_id.slice(2)),
+        imdbID: imdbID,
         posterURL: elm.poster_path,
         backgroundURL: elm.backdrop_path,
         overview: elm.overview,

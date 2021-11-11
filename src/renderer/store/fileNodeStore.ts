@@ -6,7 +6,7 @@ import initFileNodes, { appendMovie, convertToDB, initIgnoreDB, readSingleFileNo
 import type { IgnoreData } from "../../main/ignoreDB";
 import type FileNode from "../../fileNode";
 
-const path = "D:/OneDrive - stu.xjtu.edu.cn/Media/Movies/Marvel";
+const path = "D:/OneDrive - stu.xjtu.edu.cn/Media/Movies";
 
 const init = () => {
   const fileNodes = initFileNodes(path);

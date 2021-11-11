@@ -4,8 +4,8 @@
 </script>
 
 <div class="container">
-  <div class="row g-2">
-    {#each $fileNodeStore as node}
+  <div class="row g-4">
+    {#each $fileNodeStore as node (node.fullPath)}
       <MovieContainer {node} />
     {/each}
   </div>
