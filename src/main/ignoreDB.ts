@@ -1,5 +1,4 @@
 import Database from 'better-sqlite3';
-import { app } from 'electron';
 
 export interface IgnoreData {
   fullPath: string;
@@ -14,17 +13,7 @@ const convertToDB = (item: IgnoreData) => {
   }
 }
 
-const connectToDatabase = () => {
-  // If in debug mode, files will be saved to the root directory of the repository.
-  // Otherwise they will be found in the 'appData/Today List/user' folder.
-  if (process.env.NODE_ENV === 'development') {
-    const db = new Database('Ignore.db');
-    return db;
-  } else {
-    const db = new Database(app.getPath('userData') + '/user/Ignore.db');
-    return db;
-  }
-}
+const connectToDatabase = () => new Database('Ignore.db');
 
 const db = connectToDatabase();
 

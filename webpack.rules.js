@@ -1,5 +1,3 @@
-const sveltePreprocess = require("svelte-preprocess");
-
 module.exports = [
   // Add support for native node modules
   {
@@ -23,14 +21,5 @@ module.exports = [
     use: {
       loader: 'ts-loader',
     },
-  },
-  {
-    test: /\.svelte$/,
-    use: {
-      loader: 'svelte-loader',
-      options: {
-        preprocess: sveltePreprocess(),
-      }
-    },
-  },
+  }
 ];

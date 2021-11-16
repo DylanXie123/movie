@@ -1,11 +1,27 @@
 const rules = require('./webpack.rules');
 const path = require('path');
 const Dotenv = require('dotenv-webpack');
+const sveltePreprocess = require("svelte-preprocess");
 
-rules.push({
-  test: /\.css$/,
-  use: [{ loader: 'style-loader' }, { loader: 'css-loader' }],
-});
+rules.push(
+  {
+    test: /\.(s[ac]ss|css)$/i,
+    use: [
+      "style-loader",
+      "css-loader",
+      "sass-loader",
+    ],
+  },
+  {
+    test: /\.svelte$/,
+    use: {
+      loader: 'svelte-loader',
+      options: {
+        preprocess: sveltePreprocess(),
+      }
+    },
+  },
+);
 
 module.exports = {
   // Put your normal webpack config below here

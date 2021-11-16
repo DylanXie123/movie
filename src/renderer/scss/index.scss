@@ -1,0 +1,16 @@
+@import "custom";
+@import "bootstrap/scss/bootstrap";
+
+$primary: #d90000;
+$danger: #ff4136;
+
+$theme-colors: (
+  "primary":    $primary,
+  "secondary":  $secondary,
+  "success":    $success,
+  "info":       $info,
+  "warning":    $warning,
+  "danger":     $danger,
+  "light":      $light,
+  "dark":       $dark
+);

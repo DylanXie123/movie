@@ -1,22 +1,11 @@
 import Database from 'better-sqlite3';
-import { app } from 'electron';
 import type { MovieProp } from '../fileNode';
 
 export type MovieDBData = Omit<MovieProp, "releaseDate"> & { fileName: string, releaseDate?: string };
 
 export type MocieDBUpdate = Partial<MovieDBData> & { fileName: string };
 
-const connectToDatabase = () => {
-  // If in debug mode, files will be saved to the root directory of the repository.
-  // Otherwise they will be found in the 'appData/Today List/user' folder.
-  if (process.env.NODE_ENV === 'development') {
-    const db = new Database('Movie.db');
-    return db;
-  } else {
-    const db = new Database(app.getPath('userData') + '/user/Movie.db');
-    return db;
-  }
-}
+const connectToDatabase = () => new Database('Movie.db');
 
 const db = connectToDatabase();
 
