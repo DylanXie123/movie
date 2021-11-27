@@ -61,6 +61,10 @@ ipcMain.handle('openFile', async (_event, fullPath: string) => {
 })
 
 // MovieDB related events
+ipcMain.handle('movieDBimportDB', (_event, fullPath: string) => {
+  return MovieDB.importDB(fullPath);
+})
+
 ipcMain.handle('movieDBCreate', (_event, item: MovieDBData) => {
   return MovieDB.create(item);
 })
@@ -82,6 +86,10 @@ ipcMain.handle('movieDBRetrieveAll', (_event) => {
 })
 
 // IgnoreDB related events
+ipcMain.handle('ignoreDBimportDB', (_event, fullPath: string) => {
+  return IgnoreDB.importDB(fullPath);
+})
+
 ipcMain.handle('ignoreDBCreate', (_event, item: IgnoreData) => {
   return IgnoreDB.create(item);
 })

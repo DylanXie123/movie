@@ -28,6 +28,22 @@ const initDatabase = () => {
   `).run();
 }
 
+const importDB = (path: string) => {
+  const inputDB = new Database(path, { fileMustExist: true });
+  const retrieve = inputDB.prepare(`SELECT * FROM Movie`);
+  const inputData = retrieve.all();
+  const insert = db.prepare(`
+    INSERT OR REPLACE INTO Movie VALUES 
+    (@fileName, @title, @tmdbID, @imdbID, @posterURL, @backgroundURL, 
+    @overview, @language, @releaseDate, @tmdbRating, @imdbRating)
+  `);
+  const insertMany = db.transaction((values: any[]) =>
+    values.map(item => insert.run(item))
+  );
+  insertMany(inputData);
+  return inputData;
+}
+
 const create = (item: MovieDBData) => {
   const insert = db.prepare(`
     INSERT INTO Movie VALUES 
@@ -68,13 +84,14 @@ const closeDB = () => {
 }
 
 const MovieDB = {
-  initDatabase: initDatabase,
-  create: create,
-  update: update,
-  retrieve: retrieve,
-  retrieveAll: retrieveAll,
-  deleteDB: deleteDB,
-  closeDB: closeDB,
+  initDatabase,
+  importDB,
+  create,
+  update,
+  retrieve,
+  retrieveAll,
+  deleteDB,
+  closeDB,
 }
 
 export default MovieDB;

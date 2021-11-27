@@ -13,9 +13,7 @@ const convertToDB = (item: IgnoreData) => {
   }
 }
 
-const connectToDatabase = () => new Database('Ignore.db');
-
-const db = connectToDatabase();
+const db = new Database('Ignore.db');
 
 const initDatabase = () => {
   return db.prepare(`
@@ -33,6 +31,21 @@ const create = (item: IgnoreData) => {
     (@fullPath, @recursive)
   `);
   return insert.run(convertToDB(item));
+}
+
+const importDB = (path: string): IgnoreData[] => {
+  const inputDB = new Database(path, { fileMustExist: true });
+  const retrieve = inputDB.prepare('SELECT * FROM Ignore');
+  const inputData = retrieve.all();
+  const insert = db.prepare(`
+    INSERT INTO Ignore VALUES 
+    (@fullPath, @recursive)
+  `);
+  const insertMany = db.transaction((values: any[]) =>
+    values.map(item => insert.run(item))
+  );
+  insertMany(inputData);
+  return inputData;
 }
 
 const update = (newData: IgnoreData) => {
@@ -61,13 +74,14 @@ const closeDB = () => {
 }
 
 const IgnoreDB = {
-  initDatabase: initDatabase,
-  create: create,
-  update: update,
-  retrieve: retrieve,
-  retrieveAll: retrieveAll,
-  deleteDB: deleteDB,
-  closeDB: closeDB,
+  initDatabase,
+  create,
+  importDB,
+  update,
+  retrieve,
+  retrieveAll,
+  deleteDB,
+  closeDB,
 }
 
 export default IgnoreDB;

@@ -55,6 +55,7 @@ const api_key = {
 };
 
 const movieDBAPI = {
+  importDB: (fullPath: string) => ipcRenderer.invoke('movieDBimportDB', fullPath) as Promise<MovieDBData[]>,
   create: (item: MovieDBData) => ipcRenderer.invoke('movieDBCreate', item) as Promise<Database.RunResult>,
   retrieve: (fileName: string) => ipcRenderer.invoke('movieDBRetrieve', fileName) as Promise<MovieDBData>,
   update: (newData: MocieDBUpdate) => ipcRenderer.invoke('movieDBUpdate', newData) as Promise<Database.RunResult>,
@@ -63,6 +64,7 @@ const movieDBAPI = {
 };
 
 const ignoreDBAPI = {
+  importDB: (fullPath: string) => ipcRenderer.invoke('ignoreDBimportDB', fullPath) as Promise<IgnoreData[]>,
   create: (item: IgnoreData) => ipcRenderer.invoke('ignoreDBCreate', item) as Promise<Database.RunResult>,
   retrieve: (fullPath: string) => ipcRenderer.invoke('ignoreDBRetrieve', fullPath) as Promise<MovieDBData>,
   update: (newData: IgnoreData) => ipcRenderer.invoke('ignoreDBUpdate', newData) as Promise<Database.RunResult>,

@@ -2,9 +2,8 @@ import { get, writable } from "svelte/store";
 import { parse } from 'path';
 import { join } from 'path';
 import type { MovieProp } from "../../fileNode";
-import initFileNodes, { appendMovie, convertToDB, initIgnoreDB, readSingleFileNode, validateNode } from "./utils";
+import initFileNodes, { appendMovieAPI, appendMovieDB, convertToDB, initIgnoreDB, readSingleFileNode, validateNode } from "./utils";
 import type { IgnoreData } from "../../main/ignoreDB";
-import type FileNode from "../../fileNode";
 
 const path = "D:/OneDrive - stu.xjtu.edu.cn/Media/Movies";
 
@@ -17,21 +16,36 @@ function createFileNodeStore() {
   const ignoreList = writable<IgnoreData[]>([]);
   const fileNodes = writable(init());
 
+  const importIgnoreDB = (path: string) =>
+    window.ignoreDBAPI.importDB(path)
+      .then((newList) => {
+        ignoreList.update(oldList => [...oldList, ...newList]);
+        return get(ignoreList);
+      })
+      .then(filterFileNodes)
+      .then(newNodes => fileNodes.set(newNodes));
+
+  const importMovieDB = (path: string) =>
+    window.movieDBAPI.importDB(path)
+      .then(() => appendMovieDB(get(fileNodeStore)))
+      .then(nodes => fileNodes.set(nodes));
+
   const updateNode = (movieProp: MovieProp, fullPath: string) =>
     fileNodes.update(oldNodes => {
       const dbNode = convertToDB(movieProp, parse(fullPath).name);
-      const index = oldNodes.findIndex(node => node.fullPath === fullPath);
-      if (oldNodes[index].movie === undefined) {
-        window.movieDBAPI.create(dbNode);
-      } else {
-        window.movieDBAPI.update(dbNode);
-      }
-      oldNodes[index].movie = movieProp;
+      oldNodes.forEach(node => {
+        if (node.fullPath === fullPath) {
+          node.movie ?
+            window.movieDBAPI.update(dbNode) :
+            window.movieDBAPI.create(dbNode);
+          node.movie = movieProp;
+        }
+      })
       return oldNodes;
     });
 
   const addIgnore = (newIgnore: IgnoreData) => {
-    ignoreList.update(oldList => { oldList.push(newIgnore); return oldList });
+    ignoreList.update(oldList => { oldList.push(newIgnore); return oldList; });
     fileNodes.update(oldNodes => oldNodes.filter(node => node.fullPath !== newIgnore.fullPath));
     return window.ignoreDBAPI.create(newIgnore);
   }
@@ -41,7 +55,7 @@ function createFileNodeStore() {
       oldList.filter(ignore => ignore.fullPath !== removeIgnore.fullPath)
     );
     const newNode = readSingleFileNode(removeIgnore.fullPath);
-    appendMovie([newNode]).then((movieNode) =>
+    appendMovieDB([newNode]).then(appendMovieAPI).then((movieNode) =>
       fileNodes.update(oldNodes => [...oldNodes, ...movieNode])
     );
     return window.ignoreDBAPI.delete(removeIgnore.fullPath);
@@ -52,15 +66,11 @@ function createFileNodeStore() {
     return newData;
   }
 
-  const filterNode = (ignoreDB: IgnoreData[]) => {
-    let filterd: FileNode[] = [];
-    fileNodes.update(oldNodes => {
-      filterd = oldNodes.filter(node =>
-        !ignoreDB.find(item => item.fullPath === node.fullPath)
-      );
-      return filterd;
-    });
-    return filterd;
+  const filterFileNodes = (ignoreList: IgnoreData[]) => {
+    fileNodes.update(oldNodes => oldNodes.filter(node =>
+      !ignoreList.find(item => item.fullPath === node.fullPath)
+    ));
+    return get(fileNodes);
   }
 
   /**
@@ -91,8 +101,9 @@ function createFileNodeStore() {
 
   initIgnoreDB()
     .then(initIgnoreList)
-    .then(filterNode)
-    .then(filtered => appendMovie(filtered))
+    .then(filterFileNodes)
+    .then(filtered => appendMovieDB(filtered))
+    .then(filtered => appendMovieAPI(filtered))
     .then(newNodes => fileNodes.set(newNodes));
 
   addDirLitsener();
@@ -100,6 +111,8 @@ function createFileNodeStore() {
   return {
     subscribe: fileNodes.subscribe,
     subscribeIgnore: ignoreList.subscribe,
+    importIgnoreDB,
+    importMovieDB,
     updateNode,
     addIgnore,
     removeIgnore,

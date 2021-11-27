@@ -59,7 +59,20 @@ export const convertToDB = (movie: MovieProp, fileName: string): MovieDBData => 
   imdbRating: movie.imdbRating,
 });
 
-export const appendMovie = async (fileNodes: FileNode[]) => {
+export const appendMovieAPI = async (fileNodes: FileNode[]) =>
+  Promise.all(fileNodes.map(async node => {
+    if (!node.movie) {
+      const movieInfo = await TMDBAPI.searchMovie(node.parsed.name);
+      if (movieInfo && movieInfo.length && movieInfo.length > 0) {
+        node.movie = movieInfo[0];
+        const dbNode = convertToDB(movieInfo[0], node.parsed.name);
+        window.movieDBAPI.create(dbNode);
+      }
+    }
+    return node;
+  }));
+
+export const appendMovieDB = async (fileNodes: FileNode[]) => {
   const convertFromDB = (movie: MovieDBData): MovieProp => ({
     title: movie.title,
     tmdbID: movie.tmdbID,
@@ -75,28 +88,14 @@ export const appendMovie = async (fileNodes: FileNode[]) => {
 
   const moviesDB = await window.movieDBAPI.retrieveAll();
 
-  /**
-   * read data from database first
-   * if file not exist, request data from TMDB API
-   */
-  const moviePromise = fileNodes.map(async node => {
+  const movieNodes = fileNodes.map(node => {
     const movie = moviesDB.find(item => item.fileName === node.parsed.name);
-    if (movie) {
-      node.movie = convertFromDB(movie);
-    } else {
-      const movieInfo = await TMDBAPI.searchMovie(node.parsed.name);
-      node.movie = movieInfo[0];
-      if (movieInfo && movieInfo.length && movieInfo.length > 0) {
-        const dbNode = convertToDB(movieInfo[0], node.parsed.name);
-        window.movieDBAPI.create(dbNode);
-      }
-    }
+    if (movie) node.movie = convertFromDB(movie);
     return node;
   })
 
-  return await Promise.all(moviePromise);
+  return movieNodes;
 }
-
 
 export const initIgnoreDB = async () => await window.ignoreDBAPI.retrieveAll();
 
