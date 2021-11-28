@@ -26,7 +26,7 @@ export default class TMDBAPI {
         backgroundURL: json.backdrop_path,
         overview: json.overview,
         language: json.original_language,
-        releaseDate: json.release_date ? new Date(json.release_date) : undefined,
+        releaseDate: new Date(json.release_date),
         tmdbRating: json.vote_average,
       };
     } else {
@@ -50,7 +50,7 @@ export default class TMDBAPI {
         backgroundURL: elm.backdrop_path,
         overview: elm.overview,
         language: elm.original_language,
-        releaseDate: elm.release_date ? new Date(elm.release_date) : undefined,
+        releaseDate: new Date(elm.release_date),
         tmdbRating: elm.vote_average,
       };
     } else {

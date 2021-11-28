@@ -90,3 +90,4 @@ out/
 
 # Database File
 *.db
+*.sqlite

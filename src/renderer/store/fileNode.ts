@@ -11,13 +11,13 @@ interface FileNodeProp {
 export interface MovieInfo {
   title: string;
   tmdbID: number;
-  imdbID: number;
-  posterURL: string;
-  backgroundURL: string;
+  imdbID?: number;
+  posterURL?: string;
+  backgroundURL?: string;
   overview?: string;
-  language?: string;
-  releaseDate?: Date;
-  tmdbRating?: number;
+  language: string;
+  releaseDate: Date;
+  tmdbRating: number;
   imdbRating?: number;
 }
 
@@ -57,9 +57,11 @@ export default class FileNode {
    * "original"
    */
   get posterURL() {
-    return this.movie ?
-      "https://image.tmdb.org/t/p/original" + this.movie.posterURL :
-      undefined;
+    if (this.movie && this.movie.posterURL) {
+      return "https://image.tmdb.org/t/p/original" + this.movie.posterURL;
+    } else {
+      return undefined
+    }
   }
 
   /**
@@ -69,8 +71,10 @@ export default class FileNode {
    * "original"
    */
   get backgroundURL() {
-    return this.movie ?
-      "https://image.tmdb.org/t/p/original" + this.movie.backgroundURL :
-      undefined;
+    if (this.movie && this.movie.backgroundURL) {
+      return "https://image.tmdb.org/t/p/original" + this.movie.backgroundURL;
+    } else {
+      return undefined;
+    }
   }
 }

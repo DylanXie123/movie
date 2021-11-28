@@ -9,7 +9,7 @@ const convertToDB = (item: IgnoreData) => {
   }
 }
 
-const db = new Database('Ignore.db');
+const db = new Database('Ignore.sqlite');
 
 const initDatabase = () => {
   return db.prepare(`

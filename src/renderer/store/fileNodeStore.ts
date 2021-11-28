@@ -2,7 +2,7 @@ import { get, writable } from "svelte/store";
 import { parse } from 'path';
 import { join } from 'path';
 import type { MovieInfo } from "./fileNode";
-import initFileNodes, { appendMovieAPI, appendMovieDB, initIgnoreDB, readSingleFileNode, validateNode } from "./utils";
+import initFileNodes, { appendMovieAPI, appendMovieDB, initIgnoreDB, readSingleFileNode, shuffle, validateNode } from "./utils";
 import type { IgnoreData } from "./ignore";
 
 const path = "D:/OneDrive - stu.xjtu.edu.cn/Media/Movies";
@@ -23,12 +23,12 @@ function createFileNodeStore() {
         return get(ignoreList);
       })
       .then(filterFileNodes)
-      .then(newNodes => fileNodes.set(newNodes));
+      .then(fileNodes.set);
 
   const importMovieDB = (path: string) =>
     window.movieDBAPI.importDB(path)
       .then(() => appendMovieDB(get(fileNodeStore)))
-      .then(nodes => fileNodes.set(nodes));
+      .then(fileNodes.set);
 
   const updateNode = (movieProp: MovieInfo, fullPath: string) =>
     fileNodes.update(oldNodes => {
@@ -98,18 +98,22 @@ function createFileNodeStore() {
       }
     });
 
+  const shuffleFileNodes = () => fileNodes.update(shuffle);
+
   initIgnoreDB()
     .then(initIgnoreList)
     .then(filterFileNodes)
-    .then(filtered => appendMovieDB(filtered))
-    .then(filtered => appendMovieAPI(filtered))
-    .then(newNodes => fileNodes.set(newNodes));
+    .then(appendMovieDB)
+    .then(appendMovieAPI)
+    .then(shuffle)
+    .then(fileNodes.set);
 
   addDirLitsener();
 
   return {
     subscribe: fileNodes.subscribe,
     subscribeIgnore: ignoreList.subscribe,
+    shuffleFileNodes,
     importIgnoreDB,
     importMovieDB,
     updateNode,

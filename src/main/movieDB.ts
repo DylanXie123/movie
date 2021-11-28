@@ -1,7 +1,7 @@
 import Database from 'better-sqlite3';
 import type { MovieInfo } from '../renderer/store/fileNode';
 
-type MovieDBData = Omit<MovieInfo, "releaseDate"> & { fileName: string, releaseDate?: string };
+type MovieDBData = Omit<MovieInfo, "releaseDate"> & { fileName: string, releaseDate: string };
 
 const convertToDB = (movie: Partial<MovieInfo>, fileName: string): Partial<MovieDBData> => ({
   fileName: fileName,
@@ -25,12 +25,12 @@ const convertFromDB = (movie: MovieDBData): MovieInfo => ({
   backgroundURL: movie.posterURL,
   overview: movie.overview,
   language: movie.language,
-  releaseDate: movie.releaseDate ? new Date(movie.releaseDate) : undefined,
+  releaseDate: new Date(movie.releaseDate),
   tmdbRating: movie.tmdbRating,
   imdbRating: movie.imdbRating,
 });
 
-const connectToDatabase = () => new Database('Movie.db');
+const connectToDatabase = () => new Database('Movie.sqlite');
 
 const db = connectToDatabase();
 
@@ -40,13 +40,13 @@ const initDatabase = () => {
       fileName	TEXT NOT NULL UNIQUE,
       title	TEXT NOT NULL,
       tmdbID	INTEGER NOT NULL,
-      imdbID	INTEGER NOT NULL,
-      posterURL	TEXT NOT NULL,
-      backgroundURL	TEXT NOT NULL,
+      imdbID	INTEGER,
+      posterURL	TEXT,
+      backgroundURL	TEXT,
       overview	TEXT,
-      language	TEXT,
-      releaseDate	TEXT,
-      tmdbRating	NUMERIC,
+      language	TEXT NOT NULL,
+      releaseDate	TEXT NOT NULL,
+      tmdbRating	NUMERIC NOT NULL,
       imdbRating	NUMERIC,
       PRIMARY KEY("fileName")
     )
