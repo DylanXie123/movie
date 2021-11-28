@@ -14,10 +14,10 @@ export default class TMDBAPI {
     const json = await response.json();
     if (json && json.imdb_id) {
       /**
-       * If information field like imdb_id does not exist,
-       * it means requested resource does not exist.
+       * imdb_id is an optinal field
+       * use it to determine if requested data exists
        */
-      const imdbID = json.imdb_id ? parseInt(json.imdb_id.slice(2)) : json.imdb_id;
+      const imdbID = parseInt(json.imdb_id.slice(2));
       return {
         title: json.title,
         tmdbID: json.id,
@@ -65,7 +65,8 @@ export default class TMDBAPI {
     const json = await response.json();
     if (json && json.results && json.results.length) {
       const ids = json.results.map((elm: any) => elm.id) as string[];
-      return Promise.all(ids.map(id => this.movies(id) as Promise<MovieInfo>));
+      const results = await Promise.all(ids.map(id => this.movies(id)));
+      return results.filter(elm => elm !== undefined) as MovieInfo[];
     } else {
       return undefined;
     }
