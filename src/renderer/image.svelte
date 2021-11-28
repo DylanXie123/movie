@@ -9,7 +9,7 @@
     Error,
   }
 
-  let status = Status.Loading;
+  let status = Status.Error;
 
   const onComplete = () => {
     status = Status.Completed;
@@ -19,7 +19,9 @@
     status = Status.Error;
   };
 
-  $: hidden = status === Status.Error;
+  $: if (src) {
+    status = Status.Loading;
+  }
 </script>
 
 <div class="ratio" style="--bs-aspect-ratio: 150%;">
@@ -32,7 +34,10 @@
       height="100%"
     />
   {/if}
-  <a href={path ? `#/detail/${path}` : undefined}>
+  <a
+    href={path ? `#/detail/${path}` : undefined}
+    hidden={status === Status.Error}
+  >
     <img
       on:load={onComplete}
       on:error={onError}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type FileNode from "../../fileNode";
+  import type FileNode from "../store/fileNode";
   import Image from "../image.svelte";
   import fileNodeStore from "../store/fileNodeStore";
   import SearchBox from "./searchBox.svelte";

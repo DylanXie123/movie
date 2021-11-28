@@ -1,7 +1,6 @@
-import FileNode, { MovieProp } from "../../fileNode";
+import FileNode from "./fileNode";
 import { join } from 'path';
 import TMDBAPI from "../../api/TMDB";
-import type { MovieDBData } from "../../main/movieDB";
 
 export const readSingleFileNode = (path: string) => {
   const stat = window.fsAPI.statSync(path);
@@ -45,56 +44,22 @@ export const validateNode = (fileNode: FileNode) => {
   return format.test(fileNode.parsed.ext);
 }
 
-export const convertToDB = (movie: MovieProp, fileName: string): MovieDBData => ({
-  fileName: fileName,
-  title: movie.title,
-  tmdbID: movie.tmdbID,
-  imdbID: movie.imdbID,
-  posterURL: movie.posterURL,
-  backgroundURL: movie.backgroundURL,
-  overview: movie.overview,
-  language: movie.language,
-  releaseDate: movie.releaseDate ? movie.releaseDate.toDateString() : undefined,
-  tmdbRating: movie.tmdbRating,
-  imdbRating: movie.imdbRating,
-});
-
 export const appendMovieAPI = async (fileNodes: FileNode[]) =>
   Promise.all(fileNodes.map(async node => {
     if (!node.movie) {
       const movieInfo = await TMDBAPI.searchMovie(node.parsed.name);
-      if (movieInfo && movieInfo.length && movieInfo.length > 0) {
+      if (movieInfo && movieInfo.length) {
         node.movie = movieInfo[0];
-        const dbNode = convertToDB(movieInfo[0], node.parsed.name);
-        window.movieDBAPI.create(dbNode);
+        window.movieDBAPI.create(movieInfo[0], node.parsed.name);
       }
     }
     return node;
   }));
 
 export const appendMovieDB = async (fileNodes: FileNode[]) => {
-  const convertFromDB = (movie: MovieDBData): MovieProp => ({
-    title: movie.title,
-    tmdbID: movie.tmdbID,
-    imdbID: movie.imdbID,
-    posterURL: movie.posterURL,
-    backgroundURL: movie.posterURL,
-    overview: movie.overview,
-    language: movie.language,
-    releaseDate: movie.releaseDate ? new Date(movie.releaseDate) : undefined,
-    tmdbRating: movie.tmdbRating,
-    imdbRating: movie.imdbRating,
-  });
-
-  const moviesDB = await window.movieDBAPI.retrieveAll();
-
-  const movieNodes = fileNodes.map(node => {
-    const movie = moviesDB.find(item => item.fileName === node.parsed.name);
-    if (movie) node.movie = convertFromDB(movie);
-    return node;
-  })
-
-  return movieNodes;
+  const infos = await window.movieDBAPI.retrieve(fileNodes.map(node => node.parsed.name));
+  fileNodes.forEach((node, index) => node.movie = infos[index]);
+  return fileNodes;
 }
 
 export const initIgnoreDB = async () => await window.ignoreDBAPI.retrieveAll();

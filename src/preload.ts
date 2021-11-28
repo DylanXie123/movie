@@ -1,8 +1,8 @@
 import type Database from 'better-sqlite3';
 import { contextBridge, ipcRenderer } from 'electron';
 import fs from 'original-fs';
-import type { IgnoreData } from './main/ignoreDB';
-import type { MovieDBData, MocieDBUpdate } from './main/movieDB';
+import type { MovieInfo } from './renderer/store/fileNode';
+import type { IgnoreData } from './renderer/store/ignore';
 
 const readDir = (path: string) => {
   const dirents = fs.readdirSync(path, { withFileTypes: true });
@@ -55,18 +55,18 @@ const api_key = {
 };
 
 const movieDBAPI = {
-  importDB: (fullPath: string) => ipcRenderer.invoke('movieDBimportDB', fullPath) as Promise<MovieDBData[]>,
-  create: (item: MovieDBData) => ipcRenderer.invoke('movieDBCreate', item) as Promise<Database.RunResult>,
-  retrieve: (fileName: string) => ipcRenderer.invoke('movieDBRetrieve', fileName) as Promise<MovieDBData>,
-  update: (newData: MocieDBUpdate) => ipcRenderer.invoke('movieDBUpdate', newData) as Promise<Database.RunResult>,
+  importDB: (fullPath: string) => ipcRenderer.invoke('movieDBimportDB', fullPath) as Promise<MovieInfo[]>,
+  create: (movie: MovieInfo, fileName: string) => ipcRenderer.invoke('movieDBCreate', movie, fileName) as Promise<Database.RunResult>,
+  retrieve: (fileNames: string[]) => ipcRenderer.invoke('movieDBRetrieve', fileNames) as Promise<(MovieInfo | undefined)[]>,
+  update: (newData: Partial<MovieInfo>, fileName: string) => ipcRenderer.invoke('movieDBUpdate', newData, fileName) as Promise<Database.RunResult>,
   delete: (fileName: string) => ipcRenderer.invoke('movieDBDelete', fileName) as Promise<Database.RunResult>,
-  retrieveAll: () => ipcRenderer.invoke('movieDBRetrieveAll') as Promise<MovieDBData[]>,
+  retrieveAll: () => ipcRenderer.invoke('movieDBRetrieveAll') as Promise<MovieInfo[]>,
 };
 
 const ignoreDBAPI = {
   importDB: (fullPath: string) => ipcRenderer.invoke('ignoreDBimportDB', fullPath) as Promise<IgnoreData[]>,
   create: (item: IgnoreData) => ipcRenderer.invoke('ignoreDBCreate', item) as Promise<Database.RunResult>,
-  retrieve: (fullPath: string) => ipcRenderer.invoke('ignoreDBRetrieve', fullPath) as Promise<MovieDBData>,
+  retrieve: (fullPath: string) => ipcRenderer.invoke('ignoreDBRetrieve', fullPath) as Promise<IgnoreData | undefined>,
   update: (newData: IgnoreData) => ipcRenderer.invoke('ignoreDBUpdate', newData) as Promise<Database.RunResult>,
   delete: (fulllPath: string) => ipcRenderer.invoke('ignoreDBDelete', fulllPath) as Promise<Database.RunResult>,
   retrieveAll: () => ipcRenderer.invoke('ignoreDBRetrieveAll') as Promise<IgnoreData[]>,

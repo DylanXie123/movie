@@ -1,9 +1,5 @@
 import Database from 'better-sqlite3';
-
-export interface IgnoreData {
-  fullPath: string;
-  recursive: boolean;
-}
+import type { IgnoreData } from '../renderer/store/ignore';
 
 const convertToDB = (item: IgnoreData) => {
   if (item.recursive) {

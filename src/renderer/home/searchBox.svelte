@@ -1,7 +1,7 @@
 <script lang="ts">
   import TMDBAPI from "../../api/TMDB";
-  import type FileNode from "../../fileNode";
-  import type { MovieProp } from "../../fileNode";
+  import type FileNode from "../store/fileNode";
+  import type { MovieInfo } from "../store/fileNode";
   import fileNodeStore from "../store/fileNodeStore";
 
   enum Status {
@@ -13,10 +13,14 @@
 
   const search = () => {
     status = Status.Loading;
-    TMDBAPI.searchMovie(query)
+    TMDBAPI.useIMDBSearch(query)
       .then((res) => {
-        results = res;
-        status = Status.Loaded;
+        if (res) {
+          results = res;
+          status = Status.Loaded;
+        } else {
+          status = Status.Error;
+        }
       })
       .catch(() => (status = Status.Error));
   };
@@ -25,7 +29,7 @@
     results = [];
   };
 
-  const updateStore = (movie: MovieProp, fullPath: string) => {
+  const updateStore = (movie: MovieInfo, fullPath: string) => {
     fileNodeStore.updateNode(movie, fullPath);
     clear();
     status = Status.Init;
@@ -37,7 +41,7 @@
 
   let query = node.parsed.name;
 
-  let results: MovieProp[] = [];
+  let results: MovieInfo[] = [];
 </script>
 
 <div class="row g-2">

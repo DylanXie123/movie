@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import type { IgnoreData } from "../../main/ignoreDB";
+  import type { IgnoreData } from "../store/ignore";
   import fileNodeStore from "../store/fileNodeStore";
 
   let ignoreList: IgnoreData[];

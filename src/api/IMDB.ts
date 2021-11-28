@@ -5,9 +5,9 @@ export default class IMDBAPI {
     const url = new URL(`API/Search/${this.apiKey}/${name}`, this.baseURL);
     const response = await fetch(url.href);
     const json = await response.json();
-    try {
+    if (json && json.results && json.results.length) {
       return json.results.map((result: any) => result.id);
-    } catch (error) {
+    } else {
       return undefined;
     }
   }

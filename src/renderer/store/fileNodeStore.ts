@@ -1,9 +1,9 @@
 import { get, writable } from "svelte/store";
 import { parse } from 'path';
 import { join } from 'path';
-import type { MovieProp } from "../../fileNode";
-import initFileNodes, { appendMovieAPI, appendMovieDB, convertToDB, initIgnoreDB, readSingleFileNode, validateNode } from "./utils";
-import type { IgnoreData } from "../../main/ignoreDB";
+import type { MovieInfo } from "./fileNode";
+import initFileNodes, { appendMovieAPI, appendMovieDB, initIgnoreDB, readSingleFileNode, validateNode } from "./utils";
+import type { IgnoreData } from "./ignore";
 
 const path = "D:/OneDrive - stu.xjtu.edu.cn/Media/Movies";
 
@@ -30,14 +30,13 @@ function createFileNodeStore() {
       .then(() => appendMovieDB(get(fileNodeStore)))
       .then(nodes => fileNodes.set(nodes));
 
-  const updateNode = (movieProp: MovieProp, fullPath: string) =>
+  const updateNode = (movieProp: MovieInfo, fullPath: string) =>
     fileNodes.update(oldNodes => {
-      const dbNode = convertToDB(movieProp, parse(fullPath).name);
       oldNodes.forEach(node => {
         if (node.fullPath === fullPath) {
           node.movie ?
-            window.movieDBAPI.update(dbNode) :
-            window.movieDBAPI.create(dbNode);
+            window.movieDBAPI.update(movieProp, parse(fullPath).name) :
+            window.movieDBAPI.create(movieProp, parse(fullPath).name);
           node.movie = movieProp;
         }
       })

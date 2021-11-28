@@ -1,14 +1,14 @@
 import { parse, ParsedPath } from 'path';
 
-export interface FileNodeProp {
+interface FileNodeProp {
   fullPath: string;
   blocks: number;
   blksize: number;
   size: number;
-  movie?: MovieProp;
+  movie?: MovieInfo;
 }
 
-export interface MovieProp {
+export interface MovieInfo {
   title: string;
   tmdbID: number;
   imdbID: number;
@@ -36,7 +36,7 @@ export default class FileNode {
   blocks: number;
   blksize: number;
   size: number;
-  movie?: MovieProp;
+  movie?: MovieInfo;
 
 
   get onDisk() {
