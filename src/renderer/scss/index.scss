@@ -1,14 +1,23 @@
 @import "custom";
 @import "bootstrap/scss/bootstrap";
 
-$transparent: rgba(#f8f9fa, 0.1);
+$transparent: rgba(0, 0, 0, 0);
 
-$theme-colors: (
-  "transparent": $transparent,
-);
+.btn-transparent {
+  @extend .shadow-none;
+  @extend .border-0;
+  @include button-variant(
+    $transparent,
+    $transparent,
+    $color: $transparent,
+  );
+}
 
-@each $color, $value in $theme-colors {
-  .btn-#{$color} {
-    @include button-variant($value, $transparent);
-  }
+.border-bottom-grey {
+  @extend .border-bottom;
+  border-color: rgba(white, 0.2) !important;
+}
+
+body {
+  background-color: #1a2129;
 }

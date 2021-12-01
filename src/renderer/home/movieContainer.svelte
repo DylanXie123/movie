@@ -24,7 +24,7 @@
     />
     <div class="position-absolute top-0 end-0">
       <button class="btn btn-transparent rounded-circle" on:click={toggleEdit}>
-        <i class="bi bi-three-dots" />
+        <i class="bi bi-three-dots text-light" />
       </button>
     </div>
   </div>
