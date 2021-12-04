@@ -1,23 +1,7 @@
-@import "custom";
+$primary: rgb(167, 66, 235);
+$secondary: rgb(173, 181, 189);
+$dark: rgb(26, 33, 41);
+$body-color: rgb(238, 238, 238);
+$body-bg: $dark;
+
 @import "bootstrap/scss/bootstrap";
-
-$transparent: rgba(0, 0, 0, 0);
-
-.btn-transparent {
-  @extend .shadow-none;
-  @extend .border-0;
-  @include button-variant(
-    $transparent,
-    $transparent,
-    $color: $transparent,
-  );
-}
-
-.border-bottom-grey {
-  @extend .border-bottom;
-  border-color: rgba(white, 0.2) !important;
-}
-
-body {
-  background-color: #1a2129;
-}

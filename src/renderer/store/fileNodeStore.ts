@@ -2,7 +2,7 @@ import { get, writable } from "svelte/store";
 import { parse } from 'path';
 import { join } from 'path';
 import type { MovieInfo } from "./fileNode";
-import initFileNodes, { appendMovieAPI, appendMovieDB, initIgnoreDB, readSingleFileNode, shuffle, validateNode } from "./utils";
+import initFileNodes, { appendMovieAPI, appendMovieDB, initIgnoreDB, readSingleFileNode, validateNode } from "./utils";
 import type { IgnoreData } from "./ignore";
 
 const path = "D:/OneDrive - stu.xjtu.edu.cn/Media/Movies";
@@ -98,14 +98,11 @@ function createFileNodeStore() {
       }
     });
 
-  const shuffleFileNodes = () => fileNodes.update(shuffle);
-
   initIgnoreDB()
     .then(initIgnoreList)
     .then(filterFileNodes)
     .then(appendMovieDB)
     .then(appendMovieAPI)
-    .then(shuffle)
     .then(fileNodes.set);
 
   addDirLitsener();
@@ -113,7 +110,6 @@ function createFileNodeStore() {
   return {
     subscribe: fileNodes.subscribe,
     subscribeIgnore: ignoreList.subscribe,
-    shuffleFileNodes,
     importIgnoreDB,
     importMovieDB,
     updateNode,

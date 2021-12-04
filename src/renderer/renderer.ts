@@ -29,7 +29,7 @@
 import App from './App.svelte';
 import './scss/index.scss';
 import "bootstrap-icons/font/bootstrap-icons.css";
-import 'bootstrap';
+import "bootstrap/dist/js/bootstrap.bundle.min";
 
 const app = new App({
   target: document.body

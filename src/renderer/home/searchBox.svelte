@@ -45,8 +45,8 @@
   let results: MovieInfo[] = [];
 </script>
 
-<div class="row g-2 text-light">
-  <input type="text" class="form-control-plaintext text-light" bind:value={query} />
+<div class="row g-2">
+  <input type="text" class="form-control-plaintext" bind:value={query} />
   <button on:click={search} class="btn btn-primary mb-3">Search</button>
   {#if status === Status.Loading}
     <div>Loading...</div>

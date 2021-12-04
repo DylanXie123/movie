@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Router from "svelte-spa-router";
+  import Router, { link } from "svelte-spa-router";
   import Home from "./home/index.svelte";
   import Detail from "./detail/index.svelte";
   import Ignore from "./ignore/index.svelte";
@@ -13,9 +13,11 @@
   };
 </script>
 
-<nav class="navbar navbar-expand-lg navbar-dark border-bottom-grey border-2">
+<nav
+  class="navbar navbar-expand-lg navbar-dark sticky-top bg-dark navbar-border"
+>
   <div class="container-fluid">
-    <a class="navbar-brand me-auto p-2" href="/">
+    <a class="navbar-brand me-auto p-2" href="/" use:link>
       <i class="bi bi-film" />
       <span>MovieDB</span>
     </a>
@@ -30,14 +32,17 @@
     >
       <span class="navbar-toggler-icon" />
     </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <div
+      class="collapse navbar-collapse px-2 px-lg-0"
+      id="navbarSupportedContent"
+    >
       <div class="navbar-nav ms-auto mb-2 mb-lg-0 me-0 me-lg-2">
-        <a class="nav-link" aria-current="page" href="/">
+        <a class="nav-link" aria-current="page" href="/" use:link>
           <i class="bi bi-gear-wide-connected" />
           <span class="collapse" id="navbarSupportedContent">Settings</span>
         </a>
       </div>
-      <div class="d-flex me-0 me-lg-5">
+      <div class="d-flex me-0 me-lg-5 mb-2 mb-lg-0">
         <input
           class="input rounded-pill form-control form-control-sm"
           type="search"
@@ -49,5 +54,11 @@
   </div>
 </nav>
 
-
 <Router {routes} />
+
+<style lang="scss">
+  .navbar-border {
+    border-bottom: 1px solid;
+    border-color: rgba($color: #adb5bd, $alpha: 0.3);
+  }
+</style>
