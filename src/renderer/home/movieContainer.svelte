@@ -3,6 +3,7 @@
   import Image from "../image.svelte";
   import fileNodeStore from "../store/fileNodeStore";
   import SearchBox from "./searchBox.svelte";
+  import selectedStore from "../store/selectStore";
 
   export let node: FileNode;
 
@@ -17,11 +18,9 @@
 
 <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2">
   <div class="position-relative">
-    <Image
-      src={node.posterURL}
-      alt={node.movie?.title}
-      path={node.movie?.tmdbID.toString()}
-    />
+    <div on:click={() => selectedStore.set(node)} style="cursor: pointer">
+      <Image src={node.posterURL} alt={node.movie?.title} />
+    </div>
     <div class="position-absolute top-0 end-0">
       <button class="btn btn-transparent rounded-circle" on:click={toggleEdit}>
         <i class="bi bi-three-dots" />

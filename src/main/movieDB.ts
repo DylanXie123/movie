@@ -22,7 +22,7 @@ const convertFromDB = (movie: MovieDBData): MovieInfo => ({
   tmdbID: movie.tmdbID,
   imdbID: movie.imdbID,
   posterURL: movie.posterURL,
-  backgroundURL: movie.posterURL,
+  backgroundURL: movie.backgroundURL,
   overview: movie.overview,
   language: movie.language,
   releaseDate: new Date(movie.releaseDate),

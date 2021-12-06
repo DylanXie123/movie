@@ -2,6 +2,7 @@
   import { onDestroy } from "svelte";
   import type FileNode from "../store/fileNode";
   import fileNodeStore from "../store/fileNodeStore";
+  import selectedStore from "../store/selectStore";
   import { shuffle } from "../store/utils";
   import MovieContainer from "./movieContainer.svelte";
 
@@ -11,6 +12,10 @@
     ReleaseDate,
     TMDBRating,
   }
+
+  let fileNodes: FileNode[] = [];
+  let sort: Sort = Sort.Title;
+  let ascending: boolean = true;
 
   const resort = (method: Sort, ascending: boolean) => {
     const compareTitle = (a: FileNode, b: FileNode) => {
@@ -60,16 +65,10 @@
     }
   };
 
-  let fileNodes: FileNode[] = [];
-  let sort: Sort = Sort.Random;
-  let ascending: boolean = true;
-
-  const unsubscribe = fileNodeStore.subscribe((newData) => {
+  const unsubscribeFileNode = fileNodeStore.subscribe((newData) => {
     fileNodes = newData;
     fileNodes = resort(sort, ascending);
   });
-
-  onDestroy(unsubscribe);
 
   const changeSort = (newSort: Sort) => {
     sort = newSort;
@@ -80,87 +79,99 @@
     ascending = isascending;
     fileNodes = resort(sort, ascending);
   };
+
+  onDestroy(unsubscribeFileNode);
 </script>
 
-<div class="container-fluid py-3 pe-lg-5">
-  <div class="d-flex justify-content-end">
-    <div class="dropdown pe-3">
-      <button
-        class="btn btn-transparent dropdown-toggle rounded-pill"
-        type="button"
-        id="sortBy"
-        data-bs-toggle="dropdown"
-        aria-expanded="false"
-      >
-        Sort By
-      </button>
-      <ul
-        class="dropdown-menu dropdown-menu-dark rounded"
-        aria-labelledby="sortBy"
-      >
-        <li>
+<div class="d-flex h-100">
+  <div class="flex-grow-1 d-flex flex-column col-lg-8 col-sm-7">
+    <div class="container-fluid py-3 bg-dark sticky-top">
+      <div class="d-flex justify-content-end">
+        <div class="dropdown pe-3">
           <button
-            class="dropdown-item"
-            on:click={() => changeSort(Sort.Random)}
+            class="btn btn-transparent dropdown-toggle rounded-pill"
+            type="button"
+            id="sortBy"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
           >
-            <i class="bi bi-shuffle me-2" />Random
+            Sort By
           </button>
-        </li>
-        <li>
-          <button class="dropdown-item" on:click={() => changeSort(Sort.Title)}>
-            <i class="bi bi-type me-2" />Title
-          </button>
-        </li>
-        <li>
+          <ul
+            class="dropdown-menu dropdown-menu-dark rounded"
+            aria-labelledby="sortBy"
+          >
+            <li>
+              <button
+                class="dropdown-item"
+                on:click={() => changeSort(Sort.Random)}
+              >
+                <i class="bi bi-shuffle me-2" />Random
+              </button>
+            </li>
+            <li>
+              <button
+                class="dropdown-item"
+                on:click={() => changeSort(Sort.Title)}
+              >
+                <i class="bi bi-type me-2" />Title
+              </button>
+            </li>
+            <li>
+              <button
+                class="dropdown-item"
+                on:click={() => changeSort(Sort.ReleaseDate)}
+              >
+                <i class="bi bi-calendar-date me-2" />Release
+              </button>
+            </li>
+            <li>
+              <button
+                class="dropdown-item"
+                on:click={() => changeSort(Sort.TMDBRating)}
+              >
+                <i class="bi bi-bar-chart me-2" />Rating
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div class="dropdown pe-3">
           <button
-            class="dropdown-item"
-            on:click={() => changeSort(Sort.ReleaseDate)}
+            class="btn btn-transparent dropdown-toggle rounded-pill"
+            type="button"
+            id="order"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
           >
-            <i class="bi bi-calendar-date me-2" />Release
+            Order
           </button>
-        </li>
-        <li>
-          <button
-            class="dropdown-item"
-            on:click={() => changeSort(Sort.TMDBRating)}
-          >
-            <i class="bi bi-bar-chart me-2" />Rating
-          </button>
-        </li>
-      </ul>
+          <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="order">
+            <li>
+              <button class="dropdown-item" on:click={() => toASC(true)}>
+                <i class="bi bi-sort-numeric-down me-2" />ascending
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" on:click={() => toASC(false)}>
+                <i class="bi bi-sort-numeric-down-alt me-2" />descending
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
-    <div class="dropdown pe-3">
-      <button
-        class="btn btn-transparent dropdown-toggle rounded-pill"
-        type="button"
-        id="order"
-        data-bs-toggle="dropdown"
-        aria-expanded="false"
-      >
-        Order
-      </button>
-      <ul
-        class="dropdown-menu dropdown-menu-dark"
-        aria-labelledby="order"
-      >
-        <li>
-          <button class="dropdown-item" on:click={() => toASC(true)}>
-            <i class="bi bi-sort-numeric-down me-2" />ascending
-          </button>
-        </li>
-        <li>
-          <button class="dropdown-item" on:click={() => toASC(false)}>
-            <i class="bi bi-sort-numeric-down-alt me-2" />descending
-          </button>
-        </li>
-      </ul>
+    <div class="container-fluid flex-grow-1 overflow-auto">
+      <div class="row g-4">
+        {#each fileNodes as node (node.fullPath)}
+          <MovieContainer {node} />
+        {/each}
+      </div>
     </div>
   </div>
-</div>
-<div class="container">
-  <div class="row g-4">
-    {#each fileNodes as node (node.fullPath)}
-      <MovieContainer {node} />
-    {/each}
-  </div>
+
+  {#if $selectedStore}
+    <div class="container-fluid col-lg-4 col-sm-5">
+      <img class="img-fluid" src={$selectedStore.backgroundURL} alt="poster" />
+    </div>
+  {/if}
 </div>

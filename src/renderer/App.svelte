@@ -1,22 +1,20 @@
 <script lang="ts">
   import Router, { link } from "svelte-spa-router";
   import Home from "./home/index.svelte";
-  import Detail from "./detail/index.svelte";
   import Ignore from "./ignore/index.svelte";
   import Settings from "./settings/index.svelte";
 
   const routes = {
     "/": Home,
-    "/detail/:id": Detail,
     "/ignore": Ignore,
     "/settings": Settings,
   };
 </script>
 
-<nav
-  class="navbar navbar-expand-lg navbar-dark sticky-top bg-dark navbar-border"
->
-  <div class="container-fluid">
+<div class="d-flex flex-column vh-100">
+  <nav
+    class="navbar navbar-expand-lg navbar-dark sticky-top bg-dark navbar-border"
+  >
     <a class="navbar-brand me-auto p-2" href="/" use:link>
       <i class="bi bi-film" />
       <span>MovieDB</span>
@@ -37,7 +35,7 @@
       id="navbarSupportedContent"
     >
       <div class="navbar-nav ms-auto mb-2 mb-lg-0 me-0 me-lg-2">
-        <a class="nav-link" aria-current="page" href="/" use:link>
+        <a class="nav-link" aria-current="page" href="/settings" use:link>
           <i class="bi bi-gear-wide-connected" />
           <span class="collapse" id="navbarSupportedContent">Settings</span>
         </a>
@@ -51,10 +49,12 @@
         />
       </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
-<Router {routes} />
+  <div class="flex-grow-1 overflow-hidden">
+    <Router {routes} />
+  </div>
+</div>
 
 <style lang="scss">
   .navbar-border {
