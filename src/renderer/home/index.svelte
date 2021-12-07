@@ -5,6 +5,7 @@
   import selectedStore from "../store/selectStore";
   import { shuffle } from "../store/utils";
   import MovieContainer from "./movieContainer.svelte";
+  import SelectedBox from "./selectedBox.svelte";
 
   enum Sort {
     Random,
@@ -83,7 +84,7 @@
   onDestroy(unsubscribeFileNode);
 </script>
 
-<div class="d-flex h-100">
+<div class="d-flex h-100 container-xl">
   <div class="flex-grow-1 d-flex flex-column col-lg-8 col-sm-7">
     <div class="container-fluid py-3 bg-dark sticky-top">
       <div class="d-flex justify-content-end">
@@ -171,7 +172,7 @@
 
   {#if $selectedStore}
     <div class="container-fluid col-lg-4 col-sm-5">
-      <img class="img-fluid" src={$selectedStore.backgroundURL} alt="poster" />
+      <SelectedBox node={$selectedStore} />
     </div>
   {/if}
 </div>
