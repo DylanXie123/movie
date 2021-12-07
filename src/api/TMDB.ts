@@ -1,4 +1,4 @@
-import type { MovieInfo } from "../renderer/store/fileNode";
+import type { CastInfo, MovieInfo } from "../renderer/store/fileNode";
 import IMDBAPI from "./IMDB";
 
 /**
@@ -10,8 +10,22 @@ export default class TMDBAPI {
 
   static movies = async (movie_id: string): Promise<MovieInfo | undefined> => {
     const url = new URL(`3/movie/${movie_id}`, this.baseURL);
+    url.searchParams.append('append_to_response', 'credits');
     const response = await authFetch(url);
     const json = await response.json();
+
+    const parseCast = (casts: any): CastInfo[] => {
+      return casts.map((c: any) => {
+        return {
+          id: c.id,
+          name: c.name,
+          department: c.department,
+          gender: c.gender,
+          profile: c.profile_path,
+          credit_id: c.credit_id,
+        };
+      });
+    }
     if (json && json.imdb_id) {
       /**
        * imdb_id is an optinal field
@@ -28,6 +42,9 @@ export default class TMDBAPI {
         language: json.original_language,
         releaseDate: new Date(json.release_date),
         tmdbRating: json.vote_average,
+        runtime: json.runtime,
+        genres: json.genres.map((g: any) => g.name),
+        credits: parseCast(json.credits.cast),
       };
     } else {
       return undefined;
@@ -41,18 +58,8 @@ export default class TMDBAPI {
     const json = await response.json();
     if (json && json.movie_results && json.movie_results.length) {
       const elm = json.movie_results[0];
-      const imdbID = parseInt(external_id.slice(2));
-      return {
-        title: elm.title,
-        tmdbID: elm.id,
-        imdbID: imdbID,
-        posterURL: elm.poster_path,
-        backgroundURL: elm.backdrop_path,
-        overview: elm.overview,
-        language: elm.original_language,
-        releaseDate: new Date(elm.release_date),
-        tmdbRating: elm.vote_average,
-      };
+      const tmdbID = elm.id;
+      return await TMDBAPI.movies(tmdbID);
     } else {
       return undefined;
     }

@@ -1,7 +1,12 @@
 import Database from 'better-sqlite3';
 import type { MovieInfo } from '../renderer/store/fileNode';
 
-type MovieDBData = Omit<MovieInfo, "releaseDate"> & { fileName: string, releaseDate: string };
+type MovieDBData = Omit<MovieInfo, "releaseDate" | "genres" | "credits"> & {
+  fileName: string,
+  releaseDate: string,
+  genres: string,
+  credits: string,
+};
 
 const convertToDB = (movie: Partial<MovieInfo>, fileName: string): Partial<MovieDBData> => ({
   fileName: fileName,
@@ -15,6 +20,9 @@ const convertToDB = (movie: Partial<MovieInfo>, fileName: string): Partial<Movie
   releaseDate: movie.releaseDate ? movie.releaseDate.toDateString() : undefined,
   tmdbRating: movie.tmdbRating,
   imdbRating: movie.imdbRating,
+  runtime: movie.runtime,
+  genres: JSON.stringify(movie.genres),
+  credits: JSON.stringify(movie.credits),
 });
 
 const convertFromDB = (movie: MovieDBData): MovieInfo => ({
@@ -28,6 +36,9 @@ const convertFromDB = (movie: MovieDBData): MovieInfo => ({
   releaseDate: new Date(movie.releaseDate),
   tmdbRating: movie.tmdbRating,
   imdbRating: movie.imdbRating,
+  runtime: movie.runtime,
+  genres: JSON.parse(movie.genres),
+  credits: JSON.parse(movie.credits),
 });
 
 const connectToDatabase = () => new Database('Movie.sqlite');
@@ -48,6 +59,9 @@ const initDatabase = () => {
       releaseDate	TEXT NOT NULL,
       tmdbRating	NUMERIC NOT NULL,
       imdbRating	NUMERIC,
+      runtime NUMERIC,
+      genres	TEXT NOT NULL,
+      credits	TEXT NOT NULL,
       PRIMARY KEY("fileName")
     )
   `).run();
@@ -60,7 +74,8 @@ const importDB = (path: string) => {
   const insert = db.prepare(`
     INSERT OR REPLACE INTO Movie VALUES 
     (@fileName, @title, @tmdbID, @imdbID, @posterURL, @backgroundURL, 
-    @overview, @language, @releaseDate, @tmdbRating, @imdbRating)
+      @overview, @language, @releaseDate, @tmdbRating, @imdbRating, 
+      @runtime, @genres, @credits)
   `);
   const insertMany = db.transaction((values: any[]) =>
     values.map(item => insert.run(item))
@@ -74,7 +89,8 @@ const create = (movie: MovieInfo, fileName: string) => {
   const insert = db.prepare(`
     INSERT INTO Movie VALUES 
     (@fileName, @title, @tmdbID, @imdbID, @posterURL, @backgroundURL, 
-      @overview, @language, @releaseDate, @tmdbRating, @imdbRating)
+      @overview, @language, @releaseDate, @tmdbRating, @imdbRating,
+      @runtime, @genres, @credits)
   `);
   return insert.run(item);
 }

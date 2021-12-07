@@ -19,6 +19,18 @@ export interface MovieInfo {
   releaseDate: Date;
   tmdbRating: number;
   imdbRating?: number;
+  runtime?: number;
+  genres: string[];
+  credits: CastInfo[];
+}
+
+export interface CastInfo {
+  id: number;
+  name: string;
+  department: string;
+  gender?: number;
+  profile?: string;
+  credit_id: string;
 }
 
 export default class FileNode {
@@ -73,6 +85,22 @@ export default class FileNode {
   get backgroundURL() {
     if (this.movie && this.movie.backgroundURL) {
       return "https://image.tmdb.org/t/p/original" + this.movie.backgroundURL;
+    } else {
+      return undefined;
+    }
+  }
+
+  /**
+   * "w45",
+   * "w185",
+   * "h632",
+   * "original"
+   */
+  get castProfileURLs() {
+    if (this.movie && this.movie.credits.some(c => c.profile)) {
+      return this.movie.credits.map(c =>
+        c.profile ? "https://image.tmdb.org/t/p/original" + c.profile : undefined
+      );
     } else {
       return undefined;
     }
