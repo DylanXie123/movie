@@ -8,26 +8,33 @@
   import SelectedBox from "./selectedBox.svelte";
 
   enum Sort {
-    Random,
-    Title,
-    ReleaseDate,
-    TMDBRating,
+    Random = "Random",
+    Title = "Title",
+    ReleaseDate = "Release Date",
+    TMDBRating = "TMDB Rating",
+  }
+
+  enum Order {
+    Asc = "Ascending",
+    Desc = "Descending",
   }
 
   let fileNodes: FileNode[] = [];
-  let sort: Sort = Sort.Title;
-  let ascending: boolean = true;
+  let filtered: FileNode[] = [];
+  let sort = Sort.Title;
+  let order = Order.Asc;
+  let queryStr = "";
 
-  const resort = (method: Sort, ascending: boolean) => {
+  const resort = (nodes: FileNode[], newSort: Sort, newOrder: Order) => {
     const compareTitle = (a: FileNode, b: FileNode) => {
       if (a.movie === undefined || b.movie === undefined) {
         return 0;
       }
       if (a.movie.title < b.movie.title) {
-        return ascending ? -1 : 1;
+        return newOrder === Order.Asc ? -1 : 1;
       }
       if (a.movie.title > b.movie.title) {
-        return ascending ? 1 : -1;
+        return newOrder === Order.Asc ? 1 : -1;
       }
       return 0;
     };
@@ -36,7 +43,7 @@
       if (a.movie === undefined || b.movie === undefined) {
         return 0;
       }
-      if (ascending) {
+      if (newOrder === Order.Asc) {
         return a.movie.releaseDate.getTime() - b.movie.releaseDate.getTime();
       } else {
         return b.movie.releaseDate.getTime() - a.movie.releaseDate.getTime();
@@ -47,38 +54,58 @@
       if (a.movie === undefined || b.movie === undefined) {
         return 0;
       }
-      if (ascending) {
+      if (newOrder === Order.Asc) {
         return a.movie.tmdbRating - b.movie.tmdbRating;
       } else {
         return b.movie.tmdbRating - a.movie.tmdbRating;
       }
     };
 
-    switch (method) {
+    switch (newSort) {
       case Sort.Random:
-        return shuffle(fileNodes);
+        return shuffle(nodes);
       case Sort.Title:
-        return fileNodes.sort(compareTitle);
+        return nodes.sort(compareTitle);
       case Sort.ReleaseDate:
-        return fileNodes.sort(compareDate);
+        return nodes.sort(compareDate);
       case Sort.TMDBRating:
-        return fileNodes.sort(compareRating);
+        return nodes.sort(compareRating);
+    }
+  };
+
+  const queryNodes = (nodes: FileNode[], queryStr: string) => {
+    if (queryStr.length === 0) {
+      return fileNodes;
+    } else {
+      return nodes.filter((node) => {
+        if (node.movie === undefined) {
+          return false;
+        }
+        return node.movie.title.toLowerCase().includes(queryStr.toLowerCase());
+      });
     }
   };
 
   const unsubscribeFileNode = fileNodeStore.subscribe((newData) => {
     fileNodes = newData;
-    fileNodes = resort(sort, ascending);
+    filtered = queryNodes(fileNodes, queryStr);
+    filtered = resort(filtered, sort, order);
   });
 
   const changeSort = (newSort: Sort) => {
     sort = newSort;
-    fileNodes = resort(sort, ascending);
+    filtered = queryNodes(fileNodes, queryStr);
+    filtered = resort(filtered, sort, order);
   };
 
-  const toASC = (isascending: boolean) => {
-    ascending = isascending;
-    fileNodes = resort(sort, ascending);
+  const changeOrder = (newOrder: Order) => {
+    order = newOrder;
+    filtered = queryNodes(fileNodes, queryStr);
+    filtered = resort(filtered, sort, newOrder);
+  };
+
+  const applyQuery = () => {
+    filtered = queryNodes(fileNodes, queryStr);
   };
 
   onDestroy(unsubscribeFileNode);
@@ -86,7 +113,14 @@
 
 <div class="d-flex h-100 container-xl">
   <div class="flex-grow-1 d-flex flex-column col-lg-8 col-sm-7">
-    <div class="container-fluid py-3 bg-dark sticky-top">
+    <div
+      class="container-fluid py-3 bg-dark sticky-top d-flex justify-content-between"
+    >
+      <span>
+        {queryStr.length
+          ? `${filtered.length}/${fileNodes.length}`
+          : filtered.length}
+      </span>
       <div class="d-flex justify-content-end">
         <div class="dropdown pe-3">
           <button
@@ -96,7 +130,8 @@
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            Sort By
+            Sort By {sort.toString()} in
+            {order.toString()} Order
           </button>
           <ul
             class="dropdown-menu dropdown-menu-dark rounded"
@@ -134,36 +169,35 @@
                 <i class="bi bi-bar-chart me-2" />Rating
               </button>
             </li>
-          </ul>
-        </div>
-        <div class="dropdown pe-3">
-          <button
-            class="btn btn-transparent dropdown-toggle rounded-pill"
-            type="button"
-            id="order"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            Order
-          </button>
-          <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="order">
+            <li><hr class="dropdown-divider" /></li>
             <li>
-              <button class="dropdown-item" on:click={() => toASC(true)}>
+              <button
+                class="dropdown-item"
+                on:click={() => changeOrder(Order.Asc)}
+              >
                 <i class="bi bi-sort-numeric-down me-2" />ascending
               </button>
             </li>
             <li>
-              <button class="dropdown-item" on:click={() => toASC(false)}>
+              <button
+                class="dropdown-item"
+                on:click={() => changeOrder(Order.Desc)}
+              >
                 <i class="bi bi-sort-numeric-down-alt me-2" />descending
               </button>
             </li>
           </ul>
         </div>
+        <input
+          class="form-control rounded-pill"
+          bind:value={queryStr}
+          on:input={applyQuery}
+        />
       </div>
     </div>
     <div class="container-fluid flex-grow-1 overflow-auto">
       <div class="row g-4">
-        {#each fileNodes as node (node.fullPath)}
+        {#each filtered as node (node.fullPath)}
           <MovieContainer {node} />
         {/each}
       </div>

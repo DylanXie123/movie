@@ -19,36 +19,9 @@
       <i class="bi bi-film" />
       <span>MovieDB</span>
     </a>
-    <button
-      class="navbar-toggler m-2"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarSupportedContent"
-      aria-controls="navbarSupportedContent"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon" />
-    </button>
-    <div
-      class="collapse navbar-collapse px-2 px-lg-0"
-      id="navbarSupportedContent"
-    >
-      <div class="navbar-nav ms-auto mb-2 mb-lg-0 me-0 me-lg-2">
-        <a class="nav-link" aria-current="page" href="/settings" use:link>
-          <i class="bi bi-gear-wide-connected" />
-          <span class="collapse" id="navbarSupportedContent">Settings</span>
-        </a>
-      </div>
-      <div class="d-flex me-0 me-lg-5 mb-2 mb-lg-0">
-        <input
-          class="input rounded-pill form-control form-control-sm"
-          type="search"
-          placeholder="Search"
-          aria-label="Search"
-        />
-      </div>
-    </div>
+    <a class="nav-link" href="/settings" use:link>
+      <i class="bi bi-gear-wide-connected" />
+    </a>
   </nav>
 
   <div class="flex-grow-1 overflow-hidden">
