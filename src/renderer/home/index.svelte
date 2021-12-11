@@ -230,7 +230,7 @@
   </div>
 
   {#if $selectedStore}
-    <div class="col-lg-4 col-sm-5 h-100 overflow-auto">
+    <div class="col-lg-4 col-sm-5 ms-2 ps-1 border-start border-secondary">
       <SelectedBox node={$selectedStore} />
     </div>
   {/if}

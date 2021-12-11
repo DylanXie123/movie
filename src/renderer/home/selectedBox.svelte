@@ -24,7 +24,7 @@
   `;
 </script>
 
-<div class="overflow-auto">
+<div class="h-100" style="overflow-x: hidden;" data-simplebar>
   <img
     class="img-fluid"
     src={node.backgroundURL()}
@@ -33,7 +33,7 @@
   />
   <h1 class="m-2">{node.movie?.title}</h1>
   <p class="text-secondary mb-4">{node.movie?.genres.join(", ")}</p>
-  <div class="d-grid my-2">
+  <div class="d-grid my-2 px-4">
     {#if node.onDisk}
       <button class="btn btn-primary rounded-pill" on:click={play}>
         <i class="bi bi-play-circle-fill" />
@@ -76,14 +76,21 @@
   </div>
   <hr />
   {#if node.movie?.credits}
-    <div class="row my-3">
-      {#each node.movie.credits as cast}
-        <div class="col-3">
-          <img class="img-fluid" src={cast.profileURL()} alt={cast.name} />
-          <p class="text-secondary mb-0">{cast.name}</p>
-        </div>
-      {/each}
+    <div
+      class="overflow-auto my-3"
+      data-simplebar
+      data-simplebar-auto-hide="false"
+    >
+      <div class="row flex-nowrap">
+        {#each node.movie.credits as cast}
+          <div class="col-3">
+            <img class="img-fluid" src={cast.profileURL()} alt={cast.name} />
+            <p class="text-secondary mb-0">{cast.name}</p>
+          </div>
+        {/each}
+      </div>
     </div>
+    <hr />
   {/if}
   <p>{node.movie?.overview}</p>
 </div>
