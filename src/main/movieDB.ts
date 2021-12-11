@@ -1,45 +1,12 @@
 import Database from 'better-sqlite3';
 import type { MovieInfo } from '../renderer/store/fileNode';
 
-type MovieDBData = Omit<MovieInfo, "releaseDate" | "genres" | "credits"> & {
+export type MovieDBData = Omit<MovieInfo, "releaseDate" | "genres" | "credits"> & {
   fileName: string,
   releaseDate: string,
   genres: string,
   credits: string,
 };
-
-const convertToDB = (movie: Partial<MovieInfo>, fileName: string): Partial<MovieDBData> => ({
-  fileName: fileName,
-  title: movie.title,
-  tmdbID: movie.tmdbID,
-  imdbID: movie.imdbID,
-  posterURL: movie.posterURL,
-  backgroundURL: movie.backgroundURL,
-  overview: movie.overview,
-  language: movie.language,
-  releaseDate: movie.releaseDate ? movie.releaseDate.toDateString() : undefined,
-  tmdbRating: movie.tmdbRating,
-  imdbRating: movie.imdbRating,
-  runtime: movie.runtime,
-  genres: JSON.stringify(movie.genres),
-  credits: JSON.stringify(movie.credits),
-});
-
-const convertFromDB = (movie: MovieDBData): MovieInfo => ({
-  title: movie.title,
-  tmdbID: movie.tmdbID,
-  imdbID: movie.imdbID,
-  posterURL: movie.posterURL,
-  backgroundURL: movie.backgroundURL,
-  overview: movie.overview,
-  language: movie.language,
-  releaseDate: new Date(movie.releaseDate),
-  tmdbRating: movie.tmdbRating,
-  imdbRating: movie.imdbRating,
-  runtime: movie.runtime,
-  genres: JSON.parse(movie.genres),
-  credits: JSON.parse(movie.credits),
-});
 
 const connectToDatabase = () => new Database('Movie.sqlite');
 
@@ -81,11 +48,10 @@ const importDB = (path: string) => {
     values.map(item => insert.run(item))
   );
   insertMany(inputData);
-  return inputData.map(convertFromDB);
+  return inputData;
 }
 
-const create = (movie: MovieInfo, fileName: string) => {
-  const item = convertToDB(movie, fileName);
+const create = (item: MovieDBData) => {
   const insert = db.prepare(`
     INSERT INTO Movie VALUES 
     (@fileName, @title, @tmdbID, @imdbID, @posterURL, @backgroundURL, 
@@ -95,15 +61,14 @@ const create = (movie: MovieInfo, fileName: string) => {
   return insert.run(item);
 }
 
-const update = (newData: Partial<MovieInfo>, fileName: string) => {
-  const item = convertToDB(newData, fileName);
+const update = (item: Partial<MovieDBData> & { fileName: string }) => {
   let query = '';
   for (const key in item) {
     query = query + `, ${key} = @${key}`;
   }
   query = query.slice(2);
   const updateItem = db.prepare(`UPDATE Movie SET ${query} WHERE fileName = @fileName`);
-  return updateItem.run({ ...item, fileName });
+  return updateItem.run(item);
 }
 
 const retrieve = (fileNames: string[]) => {
@@ -111,14 +76,12 @@ const retrieve = (fileNames: string[]) => {
   const retrieveMany = db.transaction(
     (names: string[]) => names.map(n => rtv.get({ fileName: n }))
   );
-  const results = retrieveMany(fileNames);
-  return results.map(r => r ? convertFromDB(r) : undefined);
+  return retrieveMany(fileNames) as (MovieDBData | undefined)[];
 }
 
 const retrieveAll = () => {
   const retrieve = db.prepare(`SELECT * FROM Movie`);
-  const results = retrieve.all() as MovieDBData[];
-  return results.map(convertFromDB);
+  return retrieve.all() as MovieDBData[];
 }
 
 const deleteDB = (fileName: string) => {

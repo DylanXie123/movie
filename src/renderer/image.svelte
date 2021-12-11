@@ -1,6 +1,7 @@
 <script lang="ts">
   import Placeholder from "./placeholder.jpg";
   export let src: string | undefined;
+  export let srcset: string | undefined = src;
   export let alt = "poster";
 
   enum Status {
@@ -26,17 +27,14 @@
 
 <div class="ratio" style="--bs-aspect-ratio: 150%;">
   {#if status !== Status.Completed}
-    <img
-      src={Placeholder}
-      alt="placeholder"
-      class="shadow rounded img-fluid"
-    />
+    <img src={Placeholder} alt="placeholder" class="shadow rounded img-fluid" />
   {/if}
   <img
     on:load={onComplete}
     on:error={onError}
     class="shadow rounded img-fluid"
     {src}
+    {srcset}
     {alt}
     hidden={status === Status.Error}
   />

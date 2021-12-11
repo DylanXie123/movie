@@ -27,9 +27,11 @@
  */
 
 import App from './App.svelte';
-import './scss/index.scss';
+import 'simplebar';
+import 'simplebar/dist/simplebar.css';
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
+import './scss/index.scss';
 
 const app = new App({
   target: document.body

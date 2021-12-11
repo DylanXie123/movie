@@ -4,4 +4,12 @@ $dark: rgb(26, 33, 41);
 $body-color: rgb(238, 238, 238);
 $body-bg: $dark;
 
+.simplebar-scrollbar::before {
+  background-color: #a8bbbf;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+}
+
 @import "bootstrap/scss/bootstrap";

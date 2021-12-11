@@ -20,10 +20,11 @@
   }
 
   let fileNodes: FileNode[] = [];
-  let filtered: FileNode[] = [];
   let sort = Sort.Title;
   let order = Order.Asc;
   let queryStr = "";
+  let onlyOnDisk = false;
+  $: filtered = recalcNodes(fileNodes, onlyOnDisk, queryStr, sort, order);
 
   const resort = (nodes: FileNode[], newSort: Sort, newOrder: Order) => {
     const compareTitle = (a: FileNode, b: FileNode) => {
@@ -75,7 +76,7 @@
 
   const queryNodes = (nodes: FileNode[], queryStr: string) => {
     if (queryStr.length === 0) {
-      return fileNodes;
+      return nodes;
     } else {
       return nodes.filter((node) => {
         if (node.movie === undefined) {
@@ -86,43 +87,52 @@
     }
   };
 
+  const filterOnDisk = (nodes: FileNode[], onlyOnDisk: boolean) => {
+    if (onlyOnDisk) {
+      return nodes.filter((node) => node.onDisk);
+    } else {
+      return nodes;
+    }
+  };
+
+  const recalcNodes = (
+    originalNode: FileNode[],
+    onlyOnDisk: boolean,
+    query: string,
+    sort: Sort,
+    order: Order
+  ) => {
+    let newNodes = filterOnDisk(originalNode, onlyOnDisk);
+    newNodes = queryNodes(newNodes, query);
+    return resort(newNodes, sort, order);
+  };
+
   const unsubscribeFileNode = fileNodeStore.subscribe((newData) => {
     fileNodes = newData;
-    filtered = queryNodes(fileNodes, queryStr);
-    filtered = resort(filtered, sort, order);
+    filtered = recalcNodes(fileNodes, onlyOnDisk, queryStr, sort, order);
   });
 
   const changeSort = (newSort: Sort) => {
     sort = newSort;
-    filtered = queryNodes(fileNodes, queryStr);
-    filtered = resort(filtered, sort, order);
   };
 
   const changeOrder = (newOrder: Order) => {
     order = newOrder;
-    filtered = queryNodes(fileNodes, queryStr);
-    filtered = resort(filtered, sort, newOrder);
-  };
-
-  const applyQuery = () => {
-    filtered = queryNodes(fileNodes, queryStr);
   };
 
   onDestroy(unsubscribeFileNode);
 </script>
 
-<div class="d-flex h-100 container-xl">
+<div class="d-flex h-100">
   <div class="flex-grow-1 d-flex flex-column col-lg-8 col-sm-7">
     <div
-      class="container-fluid py-3 bg-dark sticky-top d-flex justify-content-between"
+      class="container-xl my-3 bg-dark sticky-top d-flex justify-content-between"
     >
-      <span>
-        {queryStr.length
-          ? `${filtered.length}/${fileNodes.length}`
-          : filtered.length}
-      </span>
-      <div class="d-flex justify-content-end">
-        <div class="dropdown pe-3">
+      <h3 class="m-0">
+        {filtered.length} Movies
+      </h3>
+      <div class="d-flex justify-content-end gap-3">
+        <div class="dropdown">
           <button
             class="btn btn-transparent dropdown-toggle rounded-pill"
             type="button"
@@ -130,8 +140,18 @@
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            Sort By {sort.toString()} in
-            {order.toString()} Order
+            <span class="m-0 me-2 position-relative">
+              {sort.toString()}
+              <span
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill ms-1"
+              >
+                {#if order === Order.Asc}
+                  <i class="bi bi-arrow-up-circle" />
+                {:else}
+                  <i class="bi bi-arrow-down-circle" />
+                {/if}
+              </span>
+            </span>
           </button>
           <ul
             class="dropdown-menu dropdown-menu-dark rounded"
@@ -175,7 +195,7 @@
                 class="dropdown-item"
                 on:click={() => changeOrder(Order.Asc)}
               >
-                <i class="bi bi-sort-numeric-down me-2" />ascending
+                <i class="bi bi-arrow-up me-2" />ascending
               </button>
             </li>
             <li>
@@ -183,19 +203,24 @@
                 class="dropdown-item"
                 on:click={() => changeOrder(Order.Desc)}
               >
-                <i class="bi bi-sort-numeric-down-alt me-2" />descending
+                <i class="bi bi-arrow-down me-2" />descending
               </button>
             </li>
           </ul>
         </div>
-        <input
-          class="form-control rounded-pill"
-          bind:value={queryStr}
-          on:input={applyQuery}
-        />
+        <div class="form-check m-auto">
+          <input
+            class="form-check-input bg-secondary"
+            type="checkbox"
+            bind:checked={onlyOnDisk}
+            id="checkOnDisk"
+          />
+          <label class="form-check-label" for="checkOnDisk"> Disk </label>
+        </div>
+        <input class="form-control rounded-pill" bind:value={queryStr} />
       </div>
     </div>
-    <div class="container-fluid flex-grow-1 overflow-auto">
+    <div class="container flex-grow-1 overflow-auto" data-simplebar>
       <div class="row g-4">
         {#each filtered as node (node.fullPath)}
           <MovieContainer {node} />
@@ -205,7 +230,7 @@
   </div>
 
   {#if $selectedStore}
-    <div class="container-fluid col-lg-4 col-sm-5">
+    <div class="col-lg-4 col-sm-5 h-100 overflow-auto">
       <SelectedBox node={$selectedStore} />
     </div>
   {/if}

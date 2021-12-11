@@ -1,9 +1,8 @@
 import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import Store from 'electron-store';
-import type { MovieInfo } from '../renderer/store/fileNode';
 import type { IgnoreData } from '../renderer/store/ignore';
 import IgnoreDB from './ignoreDB';
-import MovieDB from './movieDB';
+import MovieDB, { MovieDBData } from './movieDB';
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -67,12 +66,12 @@ ipcMain.handle('movieDBimportDB', (_event, fullPath: string) => {
   return MovieDB.importDB(fullPath);
 })
 
-ipcMain.handle('movieDBCreate', (_event, movie: MovieInfo, fileName: string) => {
-  return MovieDB.create(movie, fileName);
+ipcMain.handle('movieDBCreate', (_event, item: MovieDBData) => {
+  return MovieDB.create(item);
 })
 
-ipcMain.handle('movieDBUpdate', (_event, newData: Partial<MovieInfo>, fileName: string) => {
-  return MovieDB.update(newData, fileName);
+ipcMain.handle('movieDBUpdate', (_event, newItem: Partial<MovieDBData> & { fileName: string }) => {
+  return MovieDB.update(newItem);
 })
 
 ipcMain.handle('movieDBRetrieve', (_event, fileNames: string[]) => {

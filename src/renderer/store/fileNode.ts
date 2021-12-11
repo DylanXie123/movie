@@ -24,23 +24,52 @@ export interface MovieInfo {
   credits: CastInfo[];
 }
 
-export interface CastInfo {
+export class CastInfo {
+
+  constructor(prop: {
+    id: number;
+    name: string;
+    department: string;
+    gender?: number;
+    profile?: string;
+    credit_id: string;
+  }) {
+    this.id = prop.id;
+    this.name = prop.name;
+    this.department = prop.department;
+    this.gender = prop.gender;
+    this.profile = prop.profile;
+    this.credit_id = prop.credit_id;
+  }
+
   id: number;
   name: string;
   department: string;
   gender?: number;
   profile?: string;
   credit_id: string;
+
+  /**
+   * image's intrinsic width in pixels:
+   * "w45",
+   * "w185",
+   * "h632",
+   * "original"
+   */
+  profileURL = (resolution: "w45" | "w185" | "h632" | "original" = "w185") => {
+    return this.profile ? `https://image.tmdb.org/t/p/${resolution}${this.profile}` : undefined;
+  }
+
 }
 
 export default class FileNode {
-  constructor(props: FileNodeProp) {
-    this.fullPath = props.fullPath;
+  constructor(prop: FileNodeProp) {
+    this.fullPath = prop.fullPath;
     this.parsed = parse(this.fullPath);
-    this.blocks = props.blocks;
-    this.blksize = props.blksize;
-    this.size = props.size;
-    this.movie = props.movie;
+    this.blocks = prop.blocks;
+    this.blksize = prop.blksize;
+    this.size = prop.size;
+    this.movie = prop.movie;
   }
 
   fullPath: string;
@@ -49,7 +78,6 @@ export default class FileNode {
   blksize: number;
   size: number;
   movie?: MovieInfo;
-
 
   get onDisk() {
     return !(this.blocks === 0);
@@ -60,6 +88,7 @@ export default class FileNode {
   }
 
   /**
+   * image's intrinsic width in pixels:
    * "w92",
    * "w154",
    * "w185",
@@ -68,39 +97,24 @@ export default class FileNode {
    * "w780",
    * "original"
    */
-  get posterURL() {
+  posterURL = (resolution: "w92" | "w154" | "w185" | "w342" | "w500" | "w780" | "original" = "w185") => {
     if (this.movie && this.movie.posterURL) {
-      return "https://image.tmdb.org/t/p/original" + this.movie.posterURL;
+      return `https://image.tmdb.org/t/p/${resolution}${this.movie.posterURL}`;
     } else {
       return undefined
     }
   }
 
   /**
+   * image's intrinsic width in pixels:
    * "w300",
    * "w780",
    * "w1280",
    * "original"
    */
-  get backgroundURL() {
+  backgroundURL = (resolution: "w300" | "w780" | "w1280" | "original" = "w780") => {
     if (this.movie && this.movie.backgroundURL) {
-      return "https://image.tmdb.org/t/p/original" + this.movie.backgroundURL;
-    } else {
-      return undefined;
-    }
-  }
-
-  /**
-   * "w45",
-   * "w185",
-   * "h632",
-   * "original"
-   */
-  get castProfileURLs() {
-    if (this.movie && this.movie.credits.some(c => c.profile)) {
-      return this.movie.credits.map(c =>
-        c.profile ? "https://image.tmdb.org/t/p/original" + c.profile : undefined
-      );
+      return `https://image.tmdb.org/t/p/${resolution}${this.movie.backgroundURL}`;
     } else {
       return undefined;
     }
