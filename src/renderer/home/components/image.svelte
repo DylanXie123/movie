@@ -33,6 +33,7 @@
     on:load={onComplete}
     on:error={onError}
     class="shadow rounded img-fluid"
+    style="height: 100%;"
     {src}
     {srcset}
     {alt}

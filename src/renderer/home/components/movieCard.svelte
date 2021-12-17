@@ -1,0 +1,27 @@
+<script lang="ts">
+  import type FileNode from "../../store/fileNode";
+  import Image from "./image.svelte";
+  import selectedStore from "../../store/selectStore";
+
+  export let node: FileNode;
+
+  const getSrcset = (node: FileNode) => `
+    ${node.posterURL("w185")} 1x,
+    ${node.posterURL("w342")} 2x,
+    ${node.posterURL("w500")} 3x,
+    ${node.posterURL("w780")} 4x,
+    ${node.posterURL("original")} 5x
+  `;
+</script>
+
+<div class="col-sm-6 col-md-4 col-lg-3 col-xl-2">
+  <div class="position-relative">
+    <div on:click|stopPropagation={() => selectedStore.set(node)} type="button">
+      <Image
+        src={node.posterURL()}
+        srcset={node.movie?.posterURL ? getSrcset(node) : undefined}
+        alt={node.movie?.title}
+      />
+    </div>
+  </div>
+</div>

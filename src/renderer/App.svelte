@@ -13,7 +13,7 @@
 
 <div class="d-flex flex-column vh-100">
   <nav
-    class="navbar navbar-expand-lg navbar-dark sticky-top bg-dark navbar-border"
+    class="navbar navbar-expand-lg navbar-dark sticky-top bg-dark border-bottom border-light"
   >
     <a class="navbar-brand me-auto p-2" href="/" use:link>
       <i class="bi bi-film" />
@@ -28,10 +28,3 @@
     <Router {routes} />
   </div>
 </div>
-
-<style lang="scss">
-  .navbar-border {
-    border-bottom: 1px solid;
-    border-color: rgba($color: #adb5bd, $alpha: 0.3);
-  }
-</style>
