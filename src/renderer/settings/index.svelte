@@ -1,50 +1,68 @@
 <script lang="ts">
   import fileNodeStore from "../store/fileNodeStore";
+  import { onDestroy } from "svelte";
+  import type { IgnoreData } from "../store/ignore";
 
-  let ignoreFilePath: string;
+  let ignoreList: IgnoreData[];
+
+  const unsubscribe = fileNodeStore.subscribeIgnore(
+    (data) => (ignoreList = data)
+  );
+
+  onDestroy(unsubscribe);
+
+  const restore = (ignore: IgnoreData) => {
+    fileNodeStore.removeIgnore(ignore);
+  };
+  let dbFilePath: string;
 
   let movieFilePath: string;
 
-  const importIgnore = () => fileNodeStore.importIgnoreDB(ignoreFilePath);
+  const importIgnore = () => fileNodeStore.importIgnoreDB(dbFilePath);
 
   const importMovie = () => fileNodeStore.importMovieDB(movieFilePath);
+
+  const importAll = () => {
+    importIgnore();
+    importMovie();
+  };
 </script>
 
-<div class="row m-2">
-  <label for="ignore" class="form-label col-sm-1">Ignore</label>
-  <div class="col-sm-10">
-    <input
-      type="text"
-      class="form-control "
-      id="ignore"
-      bind:value={ignoreFilePath}
-    />
+<div class="d-flex flex-column h-100">
+  <div class="d-flex m-2 gap-2">
+    <label for="ignore" class="form-label mx-2">DB</label>
+    <div class="flex-grow-1">
+      <input
+        type="text"
+        class="form-control "
+        id="ignore"
+        bind:value={dbFilePath}
+      />
+    </div>
+    <button class="btn btn-primary" on:click={importAll}> Submit </button>
   </div>
-  <button class="btn btn-primary col-sm-1" on:click={importIgnore}>
-    Submit
-  </button>
-</div>
-<div class="row m-2">
-  <label for="movie" class="form-label col-sm-1">Movie</label>
-  <div class="col-sm-10">
-    <input
-      type="text"
-      class="form-control"
-      id="movie"
-      bind:value={movieFilePath}
-    />
-  </div>
-  <button class="btn btn-primary col-sm-1" on:click={importMovie}>
-    Submit
-  </button>
-</div>
 
-{#if ignoreFilePath}
-  <h2>Ignore files:</h2>
-  <p>{ignoreFilePath}</p>
-{/if}
+  {#if dbFilePath}
+    <h2>DB file:</h2>
+    <p>{dbFilePath}</p>
+  {/if}
 
-{#if movieFilePath}
-  <h2>Movie files:</h2>
-  <p>{movieFilePath}</p>
-{/if}
+  {#if ignoreList.length === 0}
+    <p>Empty Ignore List</p>
+  {:else}
+    <div class="flex-grow-1 overflow-auto container-xxl">
+      <ul class="list-group" data-simplebar>
+        {#each ignoreList as ignore (ignore.fullPath)}
+          <li
+            class="list-group-item list-group-item-dark d-flex justify-content-between"
+          >
+            <p style="word-break: break-word;">{ignore.fullPath}</p>
+            <button class="btn btn-primary" on:click={() => restore(ignore)}>
+              Restore
+            </button>
+          </li>
+        {/each}
+      </ul>
+    </div>
+  {/if}
+</div>
