@@ -6,7 +6,7 @@
   import { Order, recalcNodes, Sort } from "./filter";
   import HeadBar from "./components/headBar.svelte";
   import MovieCard from "./components/movieCard.svelte";
-  import SelectedBox from "./components/selectedBox.svelte";
+  import DetailSidebar from "../detail/index.svelte";
 
   let fileNodes: FileNode[] = [];
   let sort = Sort.Title;
@@ -57,7 +57,7 @@
   </div>
   {#if $selectedStore}
     <div class="col-lg-3 col-sm-4 ps-2">
-      <SelectedBox node={$selectedStore} />
+      <DetailSidebar node={$selectedStore} />
     </div>
   {/if}
 </div>

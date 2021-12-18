@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { beforeUpdate } from "svelte";
-
   import TMDBAPI from "../../../api/TMDB";
   import type { MovieInfo } from "../../store/fileNode";
   import type FileNode from "../../store/fileNode";
   import fileNodeStore from "../../store/fileNodeStore";
+  import getDateString from "./getDateString";
 
   enum Status {
     Init,
@@ -103,7 +102,7 @@
                 />
                 <div class="ms-2">
                   <p class="fw-bold">{movie.title}</p>
-                  <p>{movie.releaseDate}</p>
+                  <p>{getDateString(movie.releaseDate)}</p>
                 </div>
               </li>
             {/each}
