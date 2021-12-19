@@ -8,6 +8,8 @@
 
   const play = () => window.fsAPI.openFile(node.fullPath);
 
+  const openFolder = () => window.fsAPI.openFile(node.parsed.dir);
+
   const getSrcset = (node: FileNode) => `
     ${node.backgroundURL("w780")} 1x,
     ${node.backgroundURL("w1280")} 2x,
@@ -23,7 +25,7 @@
 />
 <h1 class="m-2">{node.movie?.title}</h1>
 <p class="text-secondary mb-3">{node.movie?.genres.join(", ")}</p>
-<div class="d-grid px-4">
+<div class="d-grid gap-2 px-4">
   {#if node.onDisk}
     <button class="btn btn-primary rounded-pill" on:click={play}>
       <i class="bi bi-play-circle-fill" />
@@ -35,6 +37,10 @@
       <span>Unavailable</span>
     </button>
   {/if}
+  <button class="btn btn-primary rounded-pill" on:click={openFolder}>
+    <i class="bi bi-folder2-open" />
+    <span>Folder</span>
+  </button>
 </div>
 <div class="row my-3 g-1">
   <div class="col-4">
