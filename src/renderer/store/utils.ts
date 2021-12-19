@@ -13,21 +13,29 @@ export const readSingleFileNode = (path: string) => {
   return newNode;
 }
 
+/**
+ * use try catch to handle file permission
+ * https://nodejs.org/api/fs.html#fsaccesspath-mode-callback
+ */
 export const readFileNodes = (path: string): FileNode[] => {
-  const dirs = window.fsAPI.readDir(path);
-  let nodes: FileNode[] = [];
-  dirs.forEach(dir => {
-    if (dir.isDirectory) {
-      const subPath = join(path, dir.name);
-      const newNodes = readFileNodes(subPath);
-      nodes.push(...newNodes);
-    } else {
-      const fullPath = join(path, dir.name);
-      const newNode = readSingleFileNode(fullPath);
-      nodes.push(newNode);
-    }
-  });
-  return nodes;
+  try {
+    const dirs = window.fsAPI.readDir(path);
+    let nodes: FileNode[] = [];
+    dirs.forEach(dir => {
+      if (dir.isDirectory) {
+        const subPath = join(path, dir.name);
+        const newNodes = readFileNodes(subPath);
+        nodes.push(...newNodes);
+      } else {
+        const fullPath = join(path, dir.name);
+        const newNode = readSingleFileNode(fullPath);
+        nodes.push(newNode);
+      }
+    });
+    return nodes;
+  } catch (error) {
+    return [];
+  }
 }
 
 const initFileNodes = (path: string) => {
