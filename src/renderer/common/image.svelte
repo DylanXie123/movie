@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { beforeUpdate, onMount } from "svelte";
+
   import Placeholder from "./placeholder.jpg";
   export let src: string | undefined;
   export let classStr: string = "shadow rounded img-fluid";
-  export let srcset: string | undefined = src;
+  export let srcset: string | undefined = undefined;
   export let alt: string | undefined;
   export let placeholder = Placeholder;
 
@@ -12,7 +14,7 @@
     Error,
   }
 
-  let status = Status.Error;
+  let status = Status.Loading;
 
   const onComplete = () => {
     status = Status.Completed;
@@ -22,19 +24,27 @@
     status = Status.Error;
   };
 
-  $: if (src) {
+  const toLoading = () => {
     status = Status.Loading;
-  }
+  };
+
+  /**
+   * use reacttive statement ($:) to update `status` when src changes,
+   * since reactive statement only runs when values directly appear
+   * in statement change, so we need to change `status` in a separate
+   * `toLoading` function
+   */
+  $: if (src) toLoading();
 </script>
 
 <img
   on:load={onComplete}
   on:error={onError}
   class={classStr}
+  style={status === Status.Completed ? "" : "display: none;"}
   {src}
   {srcset}
   {alt}
-  hidden={status !== Status.Completed}
 />
 <img
   src={placeholder}
