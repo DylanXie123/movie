@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { beforeUpdate, onMount } from "svelte";
-
   import Placeholder from "./placeholder.jpg";
   export let src: string | undefined;
   export let classStr: string = "shadow rounded img-fluid";

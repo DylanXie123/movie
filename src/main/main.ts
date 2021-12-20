@@ -1,8 +1,7 @@
-import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import Store from 'electron-store';
-import type { IgnoreData } from '../renderer/store/ignore';
 import IgnoreDB from './ignoreDB';
-import MovieDB, { MovieDBData } from './movieDB';
+import MovieDB from './movieDB';
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -58,57 +57,3 @@ app.on('activate', () => {
     createWindow();
   }
 });
-
-ipcMain.handle('openFile', async (_event, fullPath: string) => {
-  return await shell.openPath(fullPath);
-})
-
-// MovieDB related events
-ipcMain.handle('movieDBimportDB', (_event, fullPath: string) => {
-  return MovieDB.importDB(fullPath);
-})
-
-ipcMain.handle('movieDBCreate', (_event, item: MovieDBData) => {
-  return MovieDB.create(item);
-})
-
-ipcMain.handle('movieDBUpdate', (_event, newItem: Partial<MovieDBData> & { fileName: string }) => {
-  return MovieDB.update(newItem);
-})
-
-ipcMain.handle('movieDBRetrieve', (_event, fileNames: string[]) => {
-  return MovieDB.retrieve(fileNames);
-})
-
-ipcMain.handle('movieDBDelete', (_event, fileName: string) => {
-  return MovieDB.deleteDB(fileName);
-})
-
-ipcMain.handle('movieDBRetrieveAll', (_event) => {
-  return MovieDB.retrieveAll();
-})
-
-// IgnoreDB related events
-ipcMain.handle('ignoreDBimportDB', (_event, fullPath: string) => {
-  return IgnoreDB.importDB(fullPath);
-})
-
-ipcMain.handle('ignoreDBCreate', (_event, item: IgnoreData) => {
-  return IgnoreDB.create(item);
-})
-
-ipcMain.handle('ignoreDBUpdate', (_event, newData: IgnoreData) => {
-  return IgnoreDB.update(newData);
-})
-
-ipcMain.handle('ignoreDBRetrieve', (_event, fullPath: string) => {
-  return IgnoreDB.retrieve(fullPath);
-})
-
-ipcMain.handle('ignoreDBDelete', (_event, fullPath: string) => {
-  return IgnoreDB.deleteDB(fullPath);
-})
-
-ipcMain.handle('ignoreDBRetrieveAll', (_event) => {
-  return IgnoreDB.retrieveAll();
-})

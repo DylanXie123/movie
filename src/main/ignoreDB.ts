@@ -9,6 +9,14 @@ const convertToDB = (item: IgnoreData) => {
   }
 }
 
+const convertFromDB = (item: any): IgnoreData => {
+  if (item.recursive === 1) {
+    return { ...item, recursive: true };
+  } else {
+    return { ...item, recursive: false };
+  }
+}
+
 const db = new Database('Movie.sqlite');
 
 const initDatabase = () => {
@@ -51,13 +59,13 @@ const update = (newData: IgnoreData) => {
 
 const retrieve = (fullPath: string) => {
   const selectItem = db.prepare(`SELECT * FROM Ignore WHERE fullPath = @fullPath`);
-  return selectItem.all({ fullPath: fullPath });
+  return convertFromDB(selectItem.get({ fullPath: fullPath }));
 }
 
 const retrieveAll = () => {
   const retrieve = db.prepare(`SELECT * FROM Ignore`);
   const result = retrieve.all();
-  return result;
+  return result.map(convertFromDB);
 }
 
 const deleteDB = (fullPath: string) => {

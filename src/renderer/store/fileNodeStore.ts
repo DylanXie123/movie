@@ -2,7 +2,7 @@ import { get, writable } from "svelte/store";
 import { parse } from 'path';
 import { join } from 'path';
 import type { MovieInfo } from "./fileNode";
-import initFileNodes, { appendMovieAPI, appendMovieDB, initIgnoreDB, readSingleFileNode, validateNode } from "./utils";
+import { initFileNodes, appendMovieAPI, appendMovieDB, initIgnoreDB, readSingleFileNode, validateNode, filterFileNodes } from "./utils";
 import type { IgnoreData } from "./ignore";
 
 const path = "D:/OneDrive - stu.xjtu.edu.cn/Media/Movies";
@@ -16,19 +16,18 @@ function createFileNodeStore() {
   const ignoreList = writable<IgnoreData[]>([]);
   const fileNodes = writable(init());
 
-  const importIgnoreDB = (path: string) =>
-    window.ignoreDBAPI.importDB(path)
-      .then((newList) => {
-        ignoreList.update(oldList => [...oldList, ...newList]);
-        return get(ignoreList);
-      })
-      .then(filterFileNodes)
-      .then(fileNodes.set);
+  const importIgnoreDB = async (path: string) => {
+    const dbItems = window.ignoreDBAPI.importDB(path);
+    ignoreList.update(oldList => [...oldList, ...dbItems]);
+    const newFileNodes = filterFileNodes(get(fileNodes), get(ignoreList));
+    fileNodes.set(newFileNodes);
+  }
 
-  const importMovieDB = (path: string) =>
-    window.movieDBAPI.importDB(path)
-      .then(() => appendMovieDB(get(fileNodeStore)))
-      .then(fileNodes.set);
+  const importMovieDB = async (path: string) => {
+    window.movieDBAPI.importDB(path);
+    const newFileNodes = await appendMovieDB(get(fileNodes));
+    fileNodes.set(newFileNodes);
+  }
 
   const updateNode = (movieProp: MovieInfo, fullPath: string) =>
     fileNodes.update(oldNodes => {
@@ -65,13 +64,6 @@ function createFileNodeStore() {
     return newData;
   }
 
-  const filterFileNodes = (ignoreList: IgnoreData[]) => {
-    fileNodes.update(oldNodes => oldNodes.filter(node =>
-      !ignoreList.find(item => item.fullPath === node.fullPath)
-    ));
-    return get(fileNodes);
-  }
-
   /**
    * litsen to `rename` event, which will emit whenever a filename appears or disappears in the directory.
    * 
@@ -100,7 +92,7 @@ function createFileNodeStore() {
 
   initIgnoreDB()
     .then(initIgnoreList)
-    .then(filterFileNodes)
+    .then((ignoreItems) => filterFileNodes(get(fileNodes), ignoreItems))
     .then(appendMovieDB)
     .then(appendMovieAPI)
     .then(fileNodes.set);

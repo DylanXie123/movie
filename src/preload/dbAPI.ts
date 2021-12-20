@@ -1,8 +1,7 @@
-import type Database from 'better-sqlite3';
-import { ipcRenderer } from 'electron';
+import IgnoreDB from '../main/ignoreDB';
 import type { MovieDBData } from '../main/movieDB';
+import MovieDB from '../main/movieDB';
 import { CastInfo, MovieInfo } from '../renderer/store/fileNode';
-import type { IgnoreData } from '../renderer/store/ignore';
 
 const convertToDB = (movie: any, fileName: string): Partial<MovieDBData> => ({
   fileName: fileName,
@@ -21,7 +20,7 @@ const convertToDB = (movie: any, fileName: string): Partial<MovieDBData> => ({
   credits: JSON.stringify(movie.credits),
 });
 
-const convertFromDB = (movie: MovieDBData) => ({
+const convertFromDB = (movie: MovieDBData): MovieInfo => ({
   title: movie.title,
   tmdbID: movie.tmdbID,
   imdbID: movie.imdbID,
@@ -38,36 +37,28 @@ const convertFromDB = (movie: MovieDBData) => ({
 });
 
 const movieDBAPI = {
-  importDB: async (fullPath: string) => {
-    const dbItems = await ipcRenderer.invoke('movieDBimportDB', fullPath) as MovieDBData[];
-    return dbItems.map(convertFromDB);
-  },
+  importDB: (fullPath: string) => MovieDB.importDB(fullPath).map(convertFromDB),
   create: (movie: MovieInfo, fileName: string) => {
     const dbItem = convertToDB(movie, fileName);
-    return ipcRenderer.invoke('movieDBCreate', dbItem) as Promise<Database.RunResult>
+    return MovieDB.create(dbItem as MovieDBData);
   },
-  retrieve: async (fileNames: string[]) => {
-    const dbItems = await ipcRenderer.invoke('movieDBRetrieve', fileNames) as (MovieDBData | undefined)[];
-    return dbItems.map((item) => item ? convertFromDB(item) : undefined);
-  },
+  retrieve: (fileNames: string[]) =>
+    MovieDB.retrieve(fileNames).map((item) => item ? convertFromDB(item) : undefined),
   update: (newData: Partial<MovieInfo>, fileName: string) => {
     const dbItem = convertToDB(newData, fileName);
-    return ipcRenderer.invoke('movieDBUpdate', dbItem) as Promise<Database.RunResult>;
+    return MovieDB.update(dbItem as MovieDBData);
   },
-  delete: (fileName: string) => ipcRenderer.invoke('movieDBDelete', fileName) as Promise<Database.RunResult>,
-  retrieveAll: async () => {
-    const dbItems = await ipcRenderer.invoke('movieDBRetrieveAll') as MovieDBData[];
-    return dbItems.map(convertFromDB);
-  },
+  delete: (fileName: string) => MovieDB.deleteDB(fileName),
+  retrieveAll: () => MovieDB.retrieveAll().map(convertFromDB),
 };
 
 const ignoreDBAPI = {
-  importDB: (fullPath: string) => ipcRenderer.invoke('ignoreDBimportDB', fullPath) as Promise<IgnoreData[]>,
-  create: (item: IgnoreData) => ipcRenderer.invoke('ignoreDBCreate', item) as Promise<Database.RunResult>,
-  retrieve: (fullPath: string) => ipcRenderer.invoke('ignoreDBRetrieve', fullPath) as Promise<IgnoreData | undefined>,
-  update: (newData: IgnoreData) => ipcRenderer.invoke('ignoreDBUpdate', newData) as Promise<Database.RunResult>,
-  delete: (fulllPath: string) => ipcRenderer.invoke('ignoreDBDelete', fulllPath) as Promise<Database.RunResult>,
-  retrieveAll: () => ipcRenderer.invoke('ignoreDBRetrieveAll') as Promise<IgnoreData[]>,
+  importDB: IgnoreDB.importDB,
+  create: IgnoreDB.create,
+  retrieve: IgnoreDB.retrieve,
+  update: IgnoreDB.update,
+  delete: IgnoreDB.deleteDB,
+  retrieveAll: IgnoreDB.retrieveAll,
 };
 
 

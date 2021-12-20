@@ -1,6 +1,7 @@
 import FileNode from "./fileNode";
 import { join } from 'path';
 import TMDBAPI from "../../api/TMDB";
+import type { IgnoreData } from "./ignore";
 
 export const readSingleFileNode = (path: string) => {
   const stat = window.fsAPI.statSync(path);
@@ -38,7 +39,7 @@ export const readFileNodes = (path: string): FileNode[] => {
   }
 }
 
-const initFileNodes = (path: string) => {
+export const initFileNodes = (path: string) => {
   const exist = window.fsAPI.existSync(path);
   if (exist) {
     return readFileNodes(path);
@@ -65,30 +66,15 @@ export const appendMovieAPI = async (fileNodes: FileNode[]) =>
   }));
 
 export const appendMovieDB = async (fileNodes: FileNode[]) => {
-  const infos = await window.movieDBAPI.retrieve(fileNodes.map(node => node.parsed.name));
+  const infos = window.movieDBAPI.retrieve(fileNodes.map(node => node.parsed.name));
   fileNodes.forEach((node, index) => node.movie = infos[index]);
   return fileNodes;
 }
 
-export const initIgnoreDB = async () => await window.ignoreDBAPI.retrieveAll();
-
-export const shuffle = <T>(array: T[]) => {
-  let currentIndex = array.length;
-  let randomIndex: number;
-
-  // While there remain elements to shuffle...
-  while (currentIndex !== 0) {
-
-    // Pick a remaining element...
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-
-    // And swap it with the current element.
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex], array[currentIndex]];
-  }
-
-  return array;
+export const filterFileNodes = (fileNodes: FileNode[], ignoreList: IgnoreData[]) => {
+  return fileNodes.filter(node =>
+    !ignoreList.find(item => item.fullPath === node.fullPath)
+  );
 }
 
-export default initFileNodes;
+export const initIgnoreDB = async () => window.ignoreDBAPI.retrieveAll();
