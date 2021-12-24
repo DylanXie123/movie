@@ -21,6 +21,8 @@ const statSync = (path: string) => {
     size: stat.size,
     blksize: stat.blksize,
     blocks: stat.blocks,
+    isDirectory: stat.isDirectory(),
+    isFile: stat.isFile(),
   }
 }
 

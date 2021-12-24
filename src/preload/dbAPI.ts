@@ -3,7 +3,7 @@ import type { MovieDBData } from '../main/movieDB';
 import MovieDB from '../main/movieDB';
 import { CastInfo, MovieInfo } from '../renderer/store/fileNode';
 
-const convertToDB = (movie: any, fileName: string): Partial<MovieDBData> => ({
+const convertToDB = (movie: Partial<MovieInfo>, fileName: string): Partial<MovieDBData> => ({
   fileName: fileName,
   title: movie.title,
   tmdbID: movie.tmdbID,
@@ -20,21 +20,22 @@ const convertToDB = (movie: any, fileName: string): Partial<MovieDBData> => ({
   credits: JSON.stringify(movie.credits),
 });
 
-const convertFromDB = (movie: MovieDBData): MovieInfo => ({
-  title: movie.title,
-  tmdbID: movie.tmdbID,
-  imdbID: movie.imdbID,
-  posterURL: movie.posterURL,
-  backgroundURL: movie.backgroundURL,
-  overview: movie.overview,
-  language: movie.language,
-  releaseDate: new Date(movie.releaseDate),
-  tmdbRating: movie.tmdbRating,
-  imdbRating: movie.imdbRating,
-  runtime: movie.runtime,
-  genres: JSON.parse(movie.genres),
-  credits: (JSON.parse(movie.credits) as []).map(c => new CastInfo(c)),
-});
+const convertFromDB = (movie: MovieDBData): MovieInfo =>
+  new MovieInfo({
+    title: movie.title,
+    tmdbID: movie.tmdbID,
+    imdbID: movie.imdbID,
+    posterURL: movie.posterURL,
+    backgroundURL: movie.backgroundURL,
+    overview: movie.overview,
+    language: movie.language,
+    releaseDate: new Date(movie.releaseDate),
+    tmdbRating: movie.tmdbRating,
+    imdbRating: movie.imdbRating,
+    runtime: movie.runtime,
+    genres: JSON.parse(movie.genres),
+    credits: (JSON.parse(movie.credits) as []).map(c => new CastInfo(c)),
+  });
 
 const movieDBAPI = {
   importDB: (fullPath: string) => MovieDB.importDB(fullPath).map(convertFromDB),
@@ -49,7 +50,7 @@ const movieDBAPI = {
     return MovieDB.update(dbItem as MovieDBData);
   },
   delete: (fileName: string) => MovieDB.deleteDB(fileName),
-  retrieveAll: () => MovieDB.retrieveAll().map(convertFromDB),
+  retrieveAll: () => MovieDB.retrieveAll().map(item => [item.fileName, convertFromDB(item)]),
 };
 
 const ignoreDBAPI = {

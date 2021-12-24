@@ -1,5 +1,5 @@
-import FileNode from "./fileNode";
-import { join } from 'path';
+import FileNode, { FileTree, MovieInfo } from "./fileNode";
+import { join, parse } from 'path';
 import TMDBAPI from "../../api/TMDB";
 import type { IgnoreData } from "./ignore";
 
@@ -18,33 +18,19 @@ export const readSingleFileNode = (path: string) => {
  * use try catch to handle file permission
  * https://nodejs.org/api/fs.html#fsaccesspath-mode-callback
  */
-export const readFileNodes = (path: string): FileNode[] => {
+export const readFileTree = (path: string): FileTree | undefined => {
   try {
-    const dirs = window.fsAPI.readDir(path);
-    let nodes: FileNode[] = [];
-    dirs.forEach(dir => {
-      if (dir.isDirectory) {
-        const subPath = join(path, dir.name);
-        const newNodes = readFileNodes(subPath);
-        nodes.push(...newNodes);
-      } else {
-        const fullPath = join(path, dir.name);
-        const newNode = readSingleFileNode(fullPath);
-        nodes.push(newNode);
-      }
-    });
-    return nodes;
+    const rootNode = readSingleFileNode(path);
+    if (window.fsAPI.statSync(path).isDirectory) {
+      const dirs = window.fsAPI.readDir(path);
+      const children = dirs.map(dir => readFileTree(join(path, dir.name)));
+      const valid = children.filter(child => child !== undefined) as FileTree[];
+      return new FileTree(rootNode, valid);
+    } else {
+      return new FileTree(rootNode);
+    }
   } catch (error) {
-    return [];
-  }
-}
-
-export const initFileNodes = (path: string) => {
-  const exist = window.fsAPI.existSync(path);
-  if (exist) {
-    return readFileNodes(path);
-  } else {
-    throw new Error(`${path} is not a directory`);
+    return undefined;
   }
 }
 
@@ -53,8 +39,8 @@ export const validateNode = (fileNode: FileNode) => {
   return format.test(fileNode.parsed.ext);
 }
 
-export const appendMovieAPI = async (fileNodes: FileNode[]) =>
-  Promise.all(fileNodes.map(async node => {
+export const appendMovieAPI = async (fileTree: FileTree) => {
+  await Promise.all(fileTree.map(async node => {
     if (!node.movie) {
       const movieInfo = await TMDBAPI.searchMovie(node.parsed.name);
       if (movieInfo && movieInfo.length) {
@@ -62,19 +48,36 @@ export const appendMovieAPI = async (fileNodes: FileNode[]) =>
         window.movieDBAPI.create(movieInfo[0], node.parsed.name);
       }
     }
-    return node;
   }));
-
-export const appendMovieDB = async (fileNodes: FileNode[]) => {
-  const infos = window.movieDBAPI.retrieve(fileNodes.map(node => node.parsed.name));
-  fileNodes.forEach((node, index) => node.movie = infos[index]);
-  return fileNodes;
+  return fileTree;
 }
 
-export const filterFileNodes = (fileNodes: FileNode[], ignoreList: IgnoreData[]) => {
-  return fileNodes.filter(node =>
-    !ignoreList.find(item => item.fullPath === node.fullPath)
-  );
+export const appendMovieDB = async (fileTree: FileTree) => {
+  const movieDB = new Map(window.movieDBAPI.retrieveAll() as Iterable<[string, MovieInfo]>);
+  fileTree.forEachWithStop(node => {
+    /**
+     * in folder node, `Harry.Potter.and.the.Goblet.of.Fire.2005.1080p.BluRay.x265-RARBG` folder
+     * will be parsed as `(Harry.Potter.and.the.Goblet.of.Fire.2005.1080p.BluRay).x265-RARBG` file
+     * so, use `parsed.base` to search db
+     */
+    const movie = movieDB.get(node.children ? node.parsed.base : node.parsed.name);
+    if (movie) node.movie = movie;
+    return movie === undefined;
+  })
+  return fileTree;
+}
+
+export const filterFileTree = (fileTree: FileTree, ignoreList: IgnoreData[]) => {
+  ignoreList.forEach(ignore => {
+    /**
+     * to ignore a node, we need to get ref to its parent node,
+     * then remove the node from its parent's children
+     */
+    const parsed = parse(ignore.fullPath);
+    let parentTree = fileTree.query(parsed.dir);
+    if (parentTree) parentTree.children?.delete(ignore.fullPath);
+  });
+  return fileTree;
 }
 
 export const initIgnoreDB = async () => window.ignoreDBAPI.retrieveAll();

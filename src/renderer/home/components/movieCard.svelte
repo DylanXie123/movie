@@ -6,11 +6,11 @@
   export let node: FileNode;
 
   const getSrcset = (node: FileNode) => `
-    ${node.posterURL("w185")} 1x,
-    ${node.posterURL("w342")} 2x,
-    ${node.posterURL("w500")} 3x,
-    ${node.posterURL("w780")} 4x,
-    ${node.posterURL("original")} 5x
+    ${node.movie?.getPosterURL("w185")} 1x,
+    ${node.movie?.getPosterURL("w342")} 2x,
+    ${node.movie?.getPosterURL("w500")} 3x,
+    ${node.movie?.getPosterURL("w780")} 4x,
+    ${node.movie?.getPosterURL("original")} 5x
   `;
 </script>
 
@@ -19,7 +19,7 @@
     <div on:click|stopPropagation={() => selectedStore.set(node)} type="button">
       <div class="ratio" style="--bs-aspect-ratio: 150%;">
         <Image
-          src={node.posterURL()}
+          src={node.movie?.getPosterURL()}
           srcset={node.movie?.posterURL ? getSrcset(node) : undefined}
           alt={node.movie?.title}
         />

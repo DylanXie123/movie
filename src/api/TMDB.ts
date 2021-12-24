@@ -1,5 +1,5 @@
 import { CastInfo } from "../renderer/store/fileNode";
-import type { MovieInfo } from "../renderer/store/fileNode";
+import { MovieInfo } from "../renderer/store/fileNode";
 import IMDBAPI from "./IMDB";
 
 /**
@@ -35,7 +35,7 @@ export default class TMDBAPI {
        * use it to determine if requested data exists
        */
       const imdbID = parseInt(json.imdb_id.slice(2));
-      return {
+      return new MovieInfo({
         title: json.title,
         tmdbID: json.id,
         imdbID: imdbID,
@@ -48,7 +48,7 @@ export default class TMDBAPI {
         runtime: json.runtime,
         genres: json.genres.map((g: any) => g.name),
         credits: parseCast(json.credits.cast),
-      };
+      });
     } else {
       return undefined;
     }

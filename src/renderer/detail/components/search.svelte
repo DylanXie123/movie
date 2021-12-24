@@ -1,6 +1,6 @@
 <script lang="ts">
   import TMDBAPI from "../../../api/TMDB";
-import Image from "../../common/image.svelte";
+  import Image from "../../common/image.svelte";
   import type { MovieInfo } from "../../store/fileNode";
   import type FileNode from "../../store/fileNode";
   import fileNodeStore from "../../store/fileNodeStore";
@@ -97,11 +97,13 @@ import Image from "../../common/image.svelte";
                 style="height: 100px;"
               >
                 <Image
-                  src={`https://image.tmdb.org/t/p/w92${movie.posterURL}`}
+                  src={movie.getPosterURL()}
                   alt={movie.title}
                   classStr="shadow rounded img-fluid h-100"
                 />
-                <div class="ms-2 d-flex flex-column justify-content-between py-2">
+                <div
+                  class="ms-2 d-flex flex-column justify-content-between py-2"
+                >
                   <span class="fw-bold">{movie.title}</span>
                   <span>{getDateString(movie.releaseDate)}</span>
                 </div>

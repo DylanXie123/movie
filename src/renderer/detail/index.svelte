@@ -7,7 +7,7 @@
   export let node: FileNode;
 
   const addIgnore = () => {
-    fileNodeStore.addIgnore({ fullPath: node.fullPath, recursive: false });
+    // fileNodeStore.addIgnore({ fullPath: node.fullPath, recursive: false });
   };
 </script>
 

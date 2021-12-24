@@ -12,7 +12,7 @@
   onDestroy(unsubscribe);
 
   const restore = (ignore: IgnoreData) => {
-    fileNodeStore.removeIgnore(ignore);
+    // fileNodeStore.removeIgnore(ignore);
   };
   let dbFilePath: string;
 

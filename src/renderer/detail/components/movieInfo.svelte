@@ -11,14 +11,14 @@
   const openFolder = () => window.fsAPI.openFile(node.parsed.dir);
 
   const getSrcset = (node: FileNode) => `
-    ${node.backgroundURL("w780")} 1x,
-    ${node.backgroundURL("w1280")} 2x,
-    ${node.backgroundURL("original")} 3x
+    ${node.movie?.getBackgroundURL("w780")} 1x,
+    ${node.movie?.getBackgroundURL("w1280")} 2x,
+    ${node.movie?.getBackgroundURL("original")} 3x
   `;
 </script>
 
 <Image
-  src={node.backgroundURL()}
+  src={node.movie?.getBackgroundURL()}
   srcset={getSrcset(node)}
   alt="poster"
   {placeholder}
