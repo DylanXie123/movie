@@ -3,6 +3,7 @@
   import placeholder from "./hPlaceholder.jpg";
   import type FileNode from "../../store/fileNode";
   import getDateString from "./getDateString";
+  import OpenBtn from "./openBtn.svelte";
 
   export let node: FileNode;
 
@@ -25,23 +26,7 @@
 />
 <h1 class="m-2">{node.movie?.title}</h1>
 <p class="text-secondary mb-3">{node.movie?.genres.join(", ")}</p>
-<div class="d-grid gap-2 px-4">
-  {#if node.onDisk}
-    <button class="btn btn-primary rounded-pill" on:click={play}>
-      <i class="bi bi-play-circle-fill" />
-      <span>Watch</span>
-    </button>
-  {:else}
-    <button class="btn btn-primary rounded-pill disabled">
-      <i class="bi bi-x-circle-fill" />
-      <span>Unavailable</span>
-    </button>
-  {/if}
-  <button class="btn btn-primary rounded-pill" on:click={openFolder}>
-    <i class="bi bi-folder2-open" />
-    <span>Folder</span>
-  </button>
-</div>
+<OpenBtn {node} />
 <div class="row my-3 g-1">
   <div class="col-4">
     <p class="text-secondary mb-0">Language</p>

@@ -78,12 +78,7 @@
 
   <div class="position-relative">
     <div class="position-absolute w-100" style="z-index: 1;">
-      <ul
-        class="list-group"
-        on:focus={() => {
-          console.log("focus ul");
-        }}
-      >
+      <ul class="list-group">
         {#if status === Status.Error}
           <li class="list-group-item">Error...</li>
         {:else if status === Status.Loaded}

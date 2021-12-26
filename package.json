@@ -75,6 +75,7 @@
     "@electron-forge/plugin-webpack": "6.0.0-beta.61",
     "@tsconfig/svelte": "^2.0.1",
     "@types/better-sqlite3": "^7.4.0",
+    "@types/bootstrap": "^5.1.6",
     "@vercel/webpack-asset-relocator-loader": "1.7.0",
     "css-loader": "^6.0.0",
     "dotenv-webpack": "^7.0.3",

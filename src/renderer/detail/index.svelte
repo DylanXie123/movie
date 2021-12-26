@@ -3,6 +3,7 @@
   import type FileNode from "../store/fileNode";
   import fileNodeStore from "../store/fileNodeStore";
   import MovieInfo from "./components/movieInfo.svelte";
+  import OpenBtn from "./components/openBtn.svelte";
 
   export let node: FileNode;
 
@@ -16,6 +17,10 @@
   <div>
     {#if node.movie !== undefined}
       <MovieInfo {node} />
+    {:else}
+      <div class="mb-2">
+        <OpenBtn {node} />
+      </div>
     {/if}
   </div>
   <div class="d-grid col-6 mx-auto">

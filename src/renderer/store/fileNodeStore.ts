@@ -111,6 +111,7 @@ function createFileNodeStore() {
 
   return {
     subscribe: fileNodes.subscribe,
+    subscribeFileTree: fileTree.subscribe,
     subscribeIgnore: ignoreList.subscribe,
     importIgnoreDB,
     importMovieDB,

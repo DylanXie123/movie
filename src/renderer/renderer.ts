@@ -30,7 +30,7 @@ import App from './App.svelte';
 import 'simplebar';
 import 'simplebar/dist/simplebar.css';
 import "bootstrap-icons/font/bootstrap-icons.css";
-import "bootstrap/dist/js/bootstrap.bundle.min";
+import "bootstrap";
 import './scss/index.scss';
 
 const app = new App({
