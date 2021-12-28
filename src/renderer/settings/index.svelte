@@ -1,11 +1,11 @@
 <script lang="ts">
-  import fileNodeStore from "../store/fileNodeStore";
   import { onDestroy } from "svelte";
+  import fileTreeStore from "../store/fileTreeStore";
   import type { IgnoreData } from "../store/ignore";
 
   let ignoreList: IgnoreData[];
 
-  const unsubscribe = fileNodeStore.subscribeIgnore(
+  const unsubscribe = fileTreeStore.subscribeIgnore(
     (data) => (ignoreList = data)
   );
 
@@ -14,13 +14,14 @@
   const restore = (ignore: IgnoreData) => {
     // fileNodeStore.removeIgnore(ignore);
   };
+
   let dbFilePath: string;
 
   let movieFilePath: string;
 
-  const importIgnore = () => fileNodeStore.importIgnoreDB(dbFilePath);
+  const importIgnore = () => fileTreeStore.importIgnoreDB(dbFilePath);
 
-  const importMovie = () => fileNodeStore.importMovieDB(movieFilePath);
+  const importMovie = () => fileTreeStore.importMovieDB(movieFilePath);
 
   const importAll = () => {
     importIgnore();

@@ -1,11 +1,12 @@
-import FileNode, { FileTree, MovieInfo } from "./fileNode";
 import { join, parse } from 'path';
 import TMDBAPI from "../../api/TMDB";
+import FileTree from './fileTree';
 import type { IgnoreData } from "./ignore";
+import { MovieInfo, TVInfo } from './media';
 
-export const readSingleFileNode = (path: string) => {
+export const readLeafFileTree = (path: string) => {
   const stat = window.fsAPI.statSync(path);
-  const newNode = new FileNode({
+  const newNode = new FileTree({
     fullPath: path,
     blocks: stat.blocks,
     blksize: stat.blksize,
@@ -20,7 +21,7 @@ export const readSingleFileNode = (path: string) => {
  */
 export const readFileTree = (path: string): FileTree | undefined => {
   try {
-    const rootNode = readSingleFileNode(path);
+    const rootNode = readLeafFileTree(path);
     if (window.fsAPI.statSync(path).isDirectory) {
       const dirs = window.fsAPI.readDir(path);
       const children = dirs.map(dir => readFileTree(join(path, dir.name)));
@@ -34,18 +35,18 @@ export const readFileTree = (path: string): FileTree | undefined => {
   }
 }
 
-export const validateNode = (fileNode: FileNode) => {
+export const validateNode = (fileNode: FileTree) => {
   const format = new RegExp("^\.(mp4|mkv|avi|rmvb|webm|flv)$");
   return format.test(fileNode.parsed.ext);
 }
 
 export const appendMovieAPI = async (fileTree: FileTree) => {
   await Promise.all(fileTree.map(async node => {
-    if (!node.movie) {
+    if (!node.media) {
       const movieInfo = await TMDBAPI.searchMovie(node.parsed.name);
       if (movieInfo && movieInfo.length) {
-        node.movie = movieInfo[0];
-        window.movieDBAPI.create(movieInfo[0], node.parsed.name);
+        node.media = movieInfo[0];
+        window.movieDBAPI.create(movieInfo[0].convertToDB(node.parsed.name));
       }
     }
   }));
@@ -53,19 +54,27 @@ export const appendMovieAPI = async (fileTree: FileTree) => {
 }
 
 export const appendMovieDB = async (fileTree: FileTree) => {
-  const movieDB = new Map(window.movieDBAPI.retrieveAll() as Iterable<[string, MovieInfo]>);
+  const movieDB = new Map(window.movieDBAPI.retrieveAll().map(item => [item.fileName, item]));
   fileTree.forEachWithStop(node => {
-    /**
-     * in folder node, `Harry.Potter.and.the.Goblet.of.Fire.2005.1080p.BluRay.x265-RARBG` folder
-     * will be parsed as `(Harry.Potter.and.the.Goblet.of.Fire.2005.1080p.BluRay).x265-RARBG` file
-     * so, use `parsed.base` to search db
-     */
-    const movie = movieDB.get(node.children ? node.parsed.base : node.parsed.name);
-    if (movie) node.movie = movie;
-    return movie === undefined;
+    const media = movieDB.get(getNodeDBIndex(node));
+    if (media) {
+      if (media.runtime) {
+        node.media = MovieInfo.convertFromDB(media);
+      } else if (media.seasons) {
+        node.media = TVInfo.convertFromDB(media);
+      }
+    }
+    return media === undefined;
   })
   return fileTree;
 }
+
+/**
+ * in folder node, `Harry.Potter.and.the.Goblet.of.Fire.2005.1080p.BluRay.x265-RARBG` folder
+ * will be parsed as `(Harry.Potter.and.the.Goblet.of.Fire.2005.1080p.BluRay).x265-RARBG` file
+ * so, use `parsed.base` to search db
+ */
+export const getNodeDBIndex = (node: FileTree) => node.isLeaf ? node.parsed.name : node.parsed.base;
 
 export const filterFileTree = (fileTree: FileTree, ignoreList: IgnoreData[]) => {
   ignoreList.forEach(ignore => {

@@ -1,11 +1,10 @@
 <script lang="ts">
-  import Search from "./components/search.svelte";
-  import type FileNode from "../store/fileNode";
-  import fileNodeStore from "../store/fileNodeStore";
-  import MovieInfo from "./components/movieInfo.svelte";
+  import type FileTree from "../store/fileTree";
+  import InfoPanel from "./components/InfoPanel.svelte";
   import OpenBtn from "./components/openBtn.svelte";
+  import Search from "./components/search.svelte";
 
-  export let node: FileNode;
+  export let node: FileTree;
 
   const addIgnore = () => {
     // fileNodeStore.addIgnore({ fullPath: node.fullPath, recursive: false });
@@ -15,8 +14,8 @@
 <div class="h-100" style="overflow-x: hidden;" data-simplebar>
   <Search {node} />
   <div>
-    {#if node.movie !== undefined}
-      <MovieInfo {node} />
+    {#if node.media !== undefined}
+      <InfoPanel {node} />
     {:else}
       <div class="mb-2">
         <OpenBtn {node} />

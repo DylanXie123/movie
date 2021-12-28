@@ -1,70 +1,75 @@
 <script lang="ts">
   import Image from "../../common/image.svelte";
   import placeholder from "./hPlaceholder.jpg";
-  import type FileNode from "../../store/fileNode";
   import getDateString from "./getDateString";
   import OpenBtn from "./openBtn.svelte";
+  import { MovieInfo, TVInfo } from "../../store/media";
+  import type FileTree from "../../store/fileTree";
 
-  export let node: FileNode;
+  /**
+   * `node.media` must not be undefined
+   */
+  export let node: FileTree;
 
-  const play = () => window.fsAPI.openFile(node.fullPath);
-
-  const openFolder = () => window.fsAPI.openFile(node.parsed.dir);
-
-  const getSrcset = (node: FileNode) => `
-    ${node.movie?.getBackgroundURL("w780")} 1x,
-    ${node.movie?.getBackgroundURL("w1280")} 2x,
-    ${node.movie?.getBackgroundURL("original")} 3x
+  const getSrcset = (node: FileTree) => `
+    ${node.media?.getBackgroundURL("w780")} 1x,
+    ${node.media?.getBackgroundURL("w1280")} 2x,
+    ${node.media?.getBackgroundURL("original")} 3x
   `;
 </script>
 
 <Image
-  src={node.movie?.getBackgroundURL()}
+  src={node.media?.getBackgroundURL()}
   srcset={getSrcset(node)}
   alt="poster"
   {placeholder}
 />
-<h1 class="m-2">{node.movie?.title}</h1>
-<p class="text-secondary mb-3">{node.movie?.genres.join(", ")}</p>
+<h1 class="m-2">{node.media?.title}</h1>
+<p class="text-secondary mb-3">{node.media?.genres.join(", ")}</p>
 <OpenBtn {node} />
 <div class="row my-3 g-1">
   <div class="col-4">
     <p class="text-secondary mb-0">Language</p>
-    {node.movie?.language}
+    {node.media?.language}
   </div>
   <div class="col-4">
     <p class="text-secondary mb-0">ReleaseDate</p>
-    {getDateString(node.movie?.releaseDate)}
+    {getDateString(node.media?.releaseDate)}
   </div>
   <div class="col-4">
     <p class="text-secondary mb-0">Rating</p>
-    {node.movie?.tmdbRating}
+    {node.media?.tmdbRating}
   </div>
   <div class="col-4">
-    <p class="text-secondary mb-0">Runtime</p>
-    {node.movie?.runtime}
+    {#if node.media instanceof MovieInfo}
+      <p class="text-secondary mb-0">Runtime</p>
+      {node.media.runtime}
+    {:else if node.media instanceof TVInfo}
+      <p class="text-secondary mb-0">Seasons</p>
+      {node.media.seasons.length}
+    {/if}
   </div>
   <div class="col-4">
     <p class="text-secondary mb-0">TMDB</p>
-    {node.movie?.tmdbID}
+    {node.media?.tmdbID}
   </div>
   <div class="col-4">
     <p class="text-secondary mb-0">IMDB</p>
-    tt{node.movie?.imdbID}
+    tt{node.media?.imdbID}
   </div>
 </div>
 <hr />
-{#if node.movie?.credits}
+{#if node.media?.credits}
   <div
     class="overflow-auto my-3"
     data-simplebar
     data-simplebar-auto-hide="false"
   >
     <div class="row flex-nowrap">
-      {#each node.movie.credits as cast}
+      {#each node.media.credits as cast}
         <div class="col-3">
           <div class="ratio" style="--bs-aspect-ratio: 150%;">
-            <Image src={cast.profileURL()} alt={cast.name} />
+            <Image src={cast.getProfileURL()} alt={cast.name} />
           </div>
           <p class="text-secondary mb-0">{cast.name}</p>
         </div>
@@ -73,4 +78,4 @@
   </div>
   <hr />
 {/if}
-<p>{node.movie?.overview}</p>
+<p>{node.media?.overview}</p>

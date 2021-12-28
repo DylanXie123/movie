@@ -1,9 +1,9 @@
 <script lang="ts">
   import TMDBAPI from "../../../api/TMDB";
   import Image from "../../common/image.svelte";
-  import type { MovieInfo } from "../../store/fileNode";
-  import type FileNode from "../../store/fileNode";
-  import fileNodeStore from "../../store/fileNodeStore";
+  import type FileTree from "../../store/fileTree";
+  import fileTreeStore from "../../store/fileTreeStore";
+  import type { MediaInfo } from "../../store/media";
   import getDateString from "./getDateString";
 
   enum Status {
@@ -13,14 +13,14 @@
     Error,
   }
 
-  export let node: FileNode;
+  export let node: FileTree;
   let status = Status.Init;
   let query = node.parsed.name;
-  let results: MovieInfo[] = [];
+  let results: MediaInfo[] = [];
 
   const search = () => {
     status = Status.Loading;
-    TMDBAPI.useIMDBSearch(query)
+    TMDBAPI.searchMulti(query)
       .then((res) => {
         results = res;
         status = Status.Loaded;
@@ -32,8 +32,8 @@
     results = [];
   };
 
-  const updateStore = (movie: MovieInfo, fullPath: string) => {
-    fileNodeStore.updateNode(movie, fullPath);
+  const updateStore = (node: FileTree, newData: MediaInfo) => {
+    fileTreeStore.updateNode(node, newData);
     clear();
     status = Status.Init;
   };
@@ -63,7 +63,7 @@
         class="form-control rounded-pill my-2"
         placeholder="Search"
         type="search"
-        value={node.parsed.name}
+        value={node.parsed.base}
         on:input={(e) => (query = e.currentTarget.value)}
       />
       {#if status === Status.Loading}
@@ -87,7 +87,7 @@
           {:else}
             {#each results as movie}
               <li
-                on:click={() => updateStore(movie, node.fullPath)}
+                on:click={() => updateStore(node, movie)}
                 class="list-group-item d-flex p-1"
                 style="height: 100px;"
               >

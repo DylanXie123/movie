@@ -1,5 +1,4 @@
-import { CastInfo } from "../renderer/store/fileNode";
-import { MovieInfo } from "../renderer/store/fileNode";
+import { CastInfo, MediaInfo, MovieInfo, SeasonInfo, TVInfo } from "../renderer/store/media";
 import IMDBAPI from "./IMDB";
 
 /**
@@ -7,6 +6,19 @@ import IMDBAPI from "./IMDB";
  */
 export default class TMDBAPI {
   static baseURL = "https://api.themoviedb.org/";
+
+  static parseCast = (casts: any) => {
+    return casts.map((c: any) => {
+      return new CastInfo({
+        id: c.id,
+        name: c.name,
+        department: c.department,
+        gender: c.gender,
+        profile: c.profile_path,
+        credit_id: c.credit_id,
+      });
+    });
+  }
 
   /**
    * undefined if not found
@@ -17,23 +29,7 @@ export default class TMDBAPI {
     const response = await authFetch(url);
     const json = await response.json();
 
-    const parseCast = (casts: any) => {
-      return casts.map((c: any) => {
-        return new CastInfo({
-          id: c.id,
-          name: c.name,
-          department: c.department,
-          gender: c.gender,
-          profile: c.profile_path,
-          credit_id: c.credit_id,
-        });
-      });
-    }
-    if (json && json.imdb_id) {
-      /**
-       * imdb_id is an optinal field
-       * use it to determine if requested data exists
-       */
+    if (json && json.id) {
       const imdbID = parseInt(json.imdb_id.slice(2));
       return new MovieInfo({
         title: json.title,
@@ -43,11 +39,55 @@ export default class TMDBAPI {
         backgroundURL: json.backdrop_path,
         overview: json.overview,
         language: json.original_language,
-        releaseDate: new Date(json.release_date),
+        releaseDate: json.release_date,
         tmdbRating: json.vote_average,
         runtime: json.runtime,
         genres: json.genres.map((g: any) => g.name),
-        credits: parseCast(json.credits.cast),
+        credits: this.parseCast(json.credits.cast),
+      });
+    } else {
+      return undefined;
+    }
+  }
+
+  /**
+   * undefined if not found
+   */
+  static tvs = async (tv_id: string): Promise<TVInfo | undefined> => {
+    const url = new URL(`3/tv/${tv_id}`, this.baseURL);
+    url.searchParams.append('append_to_response', 'credits,external_ids');
+    const response = await authFetch(url);
+    const json = await response.json();
+
+    const parseSeason = (seasons: any) => {
+      return seasons.map((s: any) => {
+        return new SeasonInfo({
+          air_date: s.air_date,
+          episode_count: s.episode_count,
+          tmdbID: s.id,
+          name: s.name,
+          overview: s.overview,
+          poster_path: s.poster_path,
+          season_number: s.season_number,
+        })
+      })
+    }
+
+    if (json && json.id) {
+      const imdbID = json?.external_ids?.imdb_id ? parseInt(json.external_ids.imdb_id.slice(2)) : undefined;
+      return new TVInfo({
+        title: json.name,
+        tmdbID: json.id,
+        imdbID: imdbID,
+        posterURL: json.poster_path,
+        backgroundURL: json.backdrop_path,
+        overview: json.overview,
+        language: json.original_language,
+        releaseDate: json.first_air_date,
+        tmdbRating: json.vote_average,
+        genres: json.genres.map((g: any) => g.name),
+        credits: this.parseCast(json.credits.cast),
+        seasons: parseSeason(json.seasons),
       });
     } else {
       return undefined;
@@ -81,13 +121,9 @@ export default class TMDBAPI {
     const response = await authFetch(url);
     const json = await response.json();
     if (json && json.results) {
-      if (json.results.length) {
-        const ids = json.results.map((elm: any) => elm.id) as string[];
-        const results = await Promise.all(ids.map(id => this.movies(id)));
-        return results.filter(elm => elm !== undefined) as MovieInfo[];
-      } else {
-        return [];
-      }
+      const ids = json.results.map((elm: any) => elm.id) as string[];
+      const results = await Promise.all(ids.map(id => this.movies(id)));
+      return results.filter(elm => elm !== undefined) as MovieInfo[];
     } else {
       throw new Error(`TMDBAPI.searchMovie: ${json}`);
     }
@@ -97,14 +133,52 @@ export default class TMDBAPI {
    * may return empty array
    * throws error if sth goes wrong
    */
+  static searchTV = async (tvName: string): Promise<TVInfo[]> => {
+    const url = new URL('3/search/tv', this.baseURL);
+    url.searchParams.append('query', tvName);
+    const response = await authFetch(url);
+    const json = await response.json();
+    if (json && json.results) {
+      const ids = json.results.map((elm: any) => elm.id) as string[];
+      const results = await Promise.all(ids.map(id => this.tvs(id)));
+      return results.filter(elm => elm !== undefined) as TVInfo[];
+    } else {
+      throw new Error(`TMDBAPI.searchTV: ${json}`);
+    }
+  }
+
+  /**
+   * may return empty array
+   * throws error if sth goes wrong
+   */
+  static searchMulti = async (query: string): Promise<MediaInfo[]> => {
+    const url = new URL('3/search/multi', this.baseURL);
+    url.searchParams.append('query', query);
+    const response = await authFetch(url);
+    const json = await response.json();
+    if (json && json.results) {
+      let movies: string[] = [];
+      let tvs: string[] = [];
+      json.results.forEach((elm: any) => {
+        if (elm.media_type === 'movie') movies.push(elm.id);
+        else if (elm.media_type === 'tv') tvs.push(elm.id);
+      });
+      const movieResults = await Promise.all(movies.map(id => this.movies(id)));
+      const tvResults = await Promise.all(tvs.map(id => this.tvs(id)));
+      return movieResults.concat(tvResults).filter(elm => elm !== undefined) as MediaInfo[];
+    } else {
+      throw new Error(`TMDBAPI.searchMulti: ${json}`);
+    }
+  }
+
+  /**
+   * may return empty array
+   * throws error if sth goes wrong
+   */
   static useIMDBSearch = async (movieName: string): Promise<MovieInfo[]> => {
     const results = await IMDBAPI.searchTitle(movieName);
-    if (results.length) {
-      const movies = await Promise.all(results.map(id => this.findMovie(id)));
-      return movies.filter(movie => movie !== undefined) as MovieInfo[];
-    } else {
-      return [];
-    }
+    const movies = await Promise.all(results.map(id => this.findMovie(id)));
+    return movies.filter(movie => movie !== undefined) as MovieInfo[];
   }
 }
 

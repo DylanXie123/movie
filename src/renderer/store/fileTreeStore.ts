@@ -1,19 +1,18 @@
-import { derived, get, Subscriber, Unsubscriber, writable } from "svelte/store";
-import { parse } from 'path';
-import type { FileTree, MovieInfo } from "./fileNode";
-import { appendMovieAPI, appendMovieDB, initIgnoreDB, readSingleFileNode, filterFileTree, readFileTree, validateNode } from "./utils";
+import { derived, get, writable } from "svelte/store";
+import { appendMovieDB, initIgnoreDB, filterFileTree, readFileTree, validateNode, getNodeDBIndex } from "./utils";
 import type { IgnoreData } from "./ignore";
-import type FileNode from "./fileNode";
+import type { MediaInfo } from "./media";
+import type FileTree from "./fileTree";
 
-const path = "D:/OneDrive - stu.xjtu.edu.cn/Media/Movies/Marvel";
+const path = "D:/OneDrive - stu.xjtu.edu.cn/Media/Movies";
 
-function createFileNodeStore() {
+function createFileTreeStore() {
   const ignoreList = writable<IgnoreData[]>([]);
   const fileTree = writable(readFileTree(path));
   const fileNodes = derived(fileTree, $fileTree => {
     const nodes: FileTree[] = [];
     $fileTree.forEachWithStop(node => {
-      if (!node.isLeaf && node.movie === undefined) {
+      if (!node.isLeaf && node.media === undefined) {
         return true;
       } else {
         nodes.push(node);
@@ -39,17 +38,14 @@ function createFileNodeStore() {
     fileTree.set(newFileNodes);
   }
 
-  const updateNode = (movieProp: MovieInfo, fullPath: string) =>
-    fileTree.update(oldNodes => {
-      oldNodes.forEach(node => {
-        if (node.fullPath === fullPath) {
-          node.movie ?
-            window.movieDBAPI.update(movieProp, parse(fullPath).name) :
-            window.movieDBAPI.create(movieProp, parse(fullPath).name);
-          node.movie = movieProp;
-        }
-      })
-      return oldNodes;
+  const updateNode = (node: FileTree, newData: MediaInfo) =>
+    fileTree.update(oldTree => {
+      const query = oldTree.query(node.fullPath);
+      if (query) {
+        query.media = newData;
+        window.movieDBAPI.create(newData.convertToDB(getNodeDBIndex(query)));
+      }
+      return oldTree;
     });
 
   // const addIgnore = (newIgnore: IgnoreData) => {
@@ -121,5 +117,5 @@ function createFileNodeStore() {
   };
 }
 
-const fileNodeStore = createFileNodeStore();
-export default fileNodeStore;
+const fileTreeStore = createFileTreeStore();
+export default fileTreeStore;

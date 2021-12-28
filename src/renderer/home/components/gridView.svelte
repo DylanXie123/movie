@@ -1,19 +1,19 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
+  import type FileTree from "../../store/fileTree";
+  import fileTreeStore from "../../store/fileTreeStore";
+  import { Order, recalcNodes, Sort } from "../filter";
   import HeadBar from "./headBar.svelte";
   import MovieCard from "./movieCard.svelte";
-  import type FileNode from "../../store/fileNode";
-  import { Order, recalcNodes, Sort } from "../filter";
-  import fileNodeStore from "../../store/fileNodeStore";
 
-  let fileNodes: FileNode[] = [];
+  let fileNodes: FileTree[] = [];
   let sort = Sort.Title;
   let order = Order.Asc;
   let queryStr = "";
   let onlyOnDisk = false;
   $: filtered = recalcNodes(fileNodes, onlyOnDisk, queryStr, sort, order);
 
-  const unsubscribeFileNode = fileNodeStore.subscribe((newData) => {
+  const unsubscribeFileNode = fileTreeStore.subscribe((newData) => {
     fileNodes = newData;
     filtered = recalcNodes(fileNodes, onlyOnDisk, queryStr, sort, order);
   });

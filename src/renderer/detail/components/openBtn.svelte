@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type FileNode from "../../store/fileNode";
+  import type FileTree from "../../store/fileTree";
 
-  export let node: FileNode;
+  export let node: FileTree;
 
   const play = () => window.fsAPI.openFile(node.fullPath);
 

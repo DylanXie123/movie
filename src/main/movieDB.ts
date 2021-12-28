@@ -1,11 +1,13 @@
 import Database from 'better-sqlite3';
-import type { MovieInfo } from '../renderer/store/fileNode';
+import type { MediaInfo } from '../renderer/store/media';
 
-export type MovieDBData = Omit<MovieInfo, "releaseDate" | "genres" | "credits"> & {
+export type MediaDBData = Omit<MediaInfo, "getPosterURL" | "getBackgroundURL" | "convertToDB" | "releaseDate" | "genres" | "credits"> & {
   fileName: string,
   releaseDate: string,
   genres: string,
   credits: string,
+  runtime?: number,
+  seasons?: string,
 };
 
 const connectToDatabase = () => new Database('Movie.sqlite');
@@ -29,6 +31,7 @@ const initDatabase = () => {
       runtime NUMERIC,
       genres	TEXT NOT NULL,
       credits	TEXT NOT NULL,
+      seasons	TEXT,
       PRIMARY KEY("fileName")
     )
   `).run();
@@ -37,12 +40,12 @@ const initDatabase = () => {
 const importDB = (path: string) => {
   const inputDB = new Database(path, { fileMustExist: true });
   const retrieve = inputDB.prepare(`SELECT * FROM Movie`);
-  const inputData = retrieve.all() as MovieDBData[];
+  const inputData = retrieve.all() as MediaDBData[];
   const insert = db.prepare(`
     INSERT OR REPLACE INTO Movie VALUES 
     (@fileName, @title, @tmdbID, @imdbID, @posterURL, @backgroundURL, 
       @overview, @language, @releaseDate, @tmdbRating, @imdbRating, 
-      @runtime, @genres, @credits)
+      @runtime, @genres, @credits, @seasons)
   `);
   const insertMany = db.transaction((values: any[]) =>
     values.map(item => insert.run(item))
@@ -51,24 +54,18 @@ const importDB = (path: string) => {
   return inputData;
 }
 
-const create = (item: MovieDBData) => {
+/**
+ * use create to replace create and update
+ * use `INSERT OR REPLACE` SQL
+ */
+const create = (item: MediaDBData) => {
   const insert = db.prepare(`
-    INSERT INTO Movie VALUES 
+    INSERT OR REPLACE INTO Movie VALUES 
     (@fileName, @title, @tmdbID, @imdbID, @posterURL, @backgroundURL, 
       @overview, @language, @releaseDate, @tmdbRating, @imdbRating,
-      @runtime, @genres, @credits)
+      @runtime, @genres, @credits, @seasons)
   `);
   return insert.run(item);
-}
-
-const update = (item: Partial<MovieDBData> & { fileName: string }) => {
-  let query = '';
-  for (const key in item) {
-    query = query + `, ${key} = @${key}`;
-  }
-  query = query.slice(2);
-  const updateItem = db.prepare(`UPDATE Movie SET ${query} WHERE fileName = @fileName`);
-  return updateItem.run(item);
 }
 
 const retrieve = (fileNames: string[]) => {
@@ -76,12 +73,12 @@ const retrieve = (fileNames: string[]) => {
   const retrieveMany = db.transaction(
     (names: string[]) => names.map(n => rtv.get({ fileName: n }))
   );
-  return retrieveMany(fileNames) as (MovieDBData | undefined)[];
+  return retrieveMany(fileNames) as (MediaDBData | undefined)[];
 }
 
 const retrieveAll = () => {
   const retrieve = db.prepare(`SELECT * FROM Movie`);
-  return retrieve.all() as MovieDBData[];
+  return retrieve.all() as MediaDBData[];
 }
 
 const deleteDB = (fileName: string) => {
@@ -97,7 +94,6 @@ const MovieDB = {
   initDatabase,
   importDB,
   create,
-  update,
   retrieve,
   retrieveAll,
   deleteDB,

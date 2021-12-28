@@ -1,19 +1,9 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
-  import selectedStore from "../store/selectStore";
-  import DetailSidebar from "../detail/index.svelte";
   import ColumnView from "./components/columnView.svelte";
-  import type { FileTree } from "../store/fileNode";
   import GridView from "./components/gridView.svelte";
+  import DetailSidebar from "../detail/index.svelte";
   import viewState, { View } from "./viewState";
-
-  let detailNode: FileTree | undefined = undefined;
-
-  const unsubscribeDetailNode = selectedStore.subscribeCurrent(
-    (newData) => (detailNode = newData)
-  );
-
-  onDestroy(unsubscribeDetailNode);
+  import selectedStore from "../store/selectStore";
 </script>
 
 <div class="row h-100">
@@ -24,9 +14,9 @@
       <ColumnView />
     {/if}
   </div>
-  {#if detailNode}
+  {#if $selectedStore}
     <div class="col-lg-3 col-sm-4 ps-2 h-100">
-      <DetailSidebar node={detailNode} />
+      <DetailSidebar node={$selectedStore} />
     </div>
   {/if}
 </div>

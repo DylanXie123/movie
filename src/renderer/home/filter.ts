@@ -1,4 +1,4 @@
-import type FileNode from "../store/fileNode";
+import type FileTree from "../store/fileTree";
 
 export enum Sort {
   Random = "Random",
@@ -31,39 +31,39 @@ const shuffle = <T>(array: T[]) => {
   return array;
 }
 
-const resort = (nodes: FileNode[], newSort: Sort, newOrder: Order) => {
-  const compareTitle = (a: FileNode, b: FileNode) => {
-    if (a.movie === undefined || b.movie === undefined) {
+const resort = (nodes: FileTree[], newSort: Sort, newOrder: Order) => {
+  const compareTitle = (a: FileTree, b: FileTree) => {
+    if (a.media === undefined || b.media === undefined) {
       return 0;
     }
-    if (a.movie.title < b.movie.title) {
+    if (a.media.title < b.media.title) {
       return newOrder === Order.Asc ? -1 : 1;
     }
-    if (a.movie.title > b.movie.title) {
+    if (a.media.title > b.media.title) {
       return newOrder === Order.Asc ? 1 : -1;
     }
     return 0;
   };
 
-  const compareDate = (a: FileNode, b: FileNode) => {
-    if (a.movie === undefined || b.movie === undefined) {
+  const compareDate = (a: FileTree, b: FileTree) => {
+    if (a.media === undefined || b.media === undefined) {
       return 0;
     }
     if (newOrder === Order.Asc) {
-      return a.movie.releaseDate.getTime() - b.movie.releaseDate.getTime();
+      return a.media.releaseDate.getTime() - b.media.releaseDate.getTime();
     } else {
-      return b.movie.releaseDate.getTime() - a.movie.releaseDate.getTime();
+      return b.media.releaseDate.getTime() - a.media.releaseDate.getTime();
     }
   };
 
-  const compareRating = (a: FileNode, b: FileNode) => {
-    if (a.movie === undefined || b.movie === undefined) {
+  const compareRating = (a: FileTree, b: FileTree) => {
+    if (a.media === undefined || b.media === undefined) {
       return 0;
     }
     if (newOrder === Order.Asc) {
-      return a.movie.tmdbRating - b.movie.tmdbRating;
+      return a.media.tmdbRating - b.media.tmdbRating;
     } else {
-      return b.movie.tmdbRating - a.movie.tmdbRating;
+      return b.media.tmdbRating - a.media.tmdbRating;
     }
   };
 
@@ -79,20 +79,20 @@ const resort = (nodes: FileNode[], newSort: Sort, newOrder: Order) => {
   }
 };
 
-const queryNodes = (nodes: FileNode[], queryStr: string) => {
+const queryNodes = (nodes: FileTree[], queryStr: string) => {
   if (queryStr.length === 0) {
     return nodes;
   } else {
     return nodes.filter((node) => {
-      if (node.movie === undefined) {
+      if (node.media === undefined) {
         return false;
       }
-      return node.movie.title.toLowerCase().includes(queryStr.toLowerCase());
+      return node.media.title.toLowerCase().includes(queryStr.toLowerCase());
     });
   }
 };
 
-const filterOnDisk = (nodes: FileNode[], onlyOnDisk: boolean) => {
+const filterOnDisk = (nodes: FileTree[], onlyOnDisk: boolean) => {
   if (onlyOnDisk) {
     return nodes.filter((node) => node.onDisk);
   } else {
@@ -101,7 +101,7 @@ const filterOnDisk = (nodes: FileNode[], onlyOnDisk: boolean) => {
 };
 
 export const recalcNodes = (
-  originalNode: FileNode[],
+  originalNode: FileTree[],
   onlyOnDisk: boolean,
   query: string,
   sort: Sort,
