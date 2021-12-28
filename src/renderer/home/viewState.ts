@@ -5,6 +5,6 @@ export enum View {
   Column,
 }
 
-const viewState = writable(View.Column);
+const viewState = writable(View.Grid);
 
 export default viewState;

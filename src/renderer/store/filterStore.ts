@@ -80,18 +80,9 @@ const resort = (nodes: FileTree[], newSort: Sort, newOrder: Order) => {
   }
 };
 
-const queryNodes = (nodes: FileTree[], queryStr: string) => {
-  if (queryStr.length === 0) {
-    return nodes;
-  } else {
-    return nodes.filter((node) => {
-      if (node.media === undefined) {
-        return false;
-      }
-      return node.media.title.toLowerCase().includes(queryStr.toLowerCase());
-    });
-  }
-};
+const queryNodes = (nodes: FileTree[], queryStr: string) => nodes.filter((node) =>
+  node.fullPath.toLowerCase().includes(queryStr.toLowerCase()) || node.media?.title.toLowerCase().includes(queryStr.toLowerCase())
+);
 
 const filterOnDisk = (nodes: FileTree[], onlyOnDisk: boolean) => {
   if (onlyOnDisk) {

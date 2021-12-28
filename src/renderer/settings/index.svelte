@@ -12,21 +12,14 @@
   onDestroy(unsubscribe);
 
   const restore = (ignore: IgnoreData) => {
-    // fileNodeStore.removeIgnore(ignore);
+    fileTreeStore.removeIgnore(ignore);
   };
-
-  let dbFilePath: string;
 
   let movieFilePath: string;
+  let initPath: string;
 
-  const importIgnore = () => fileTreeStore.importIgnoreDB(dbFilePath);
-
-  const importMovie = () => fileTreeStore.importMovieDB(movieFilePath);
-
-  const importAll = () => {
-    importIgnore();
-    importMovie();
-  };
+  const importMovieDB = () => fileTreeStore.importMovieDB(movieFilePath);
+  const storeInitPath = () => window.storageAPI.set("path", initPath);
 </script>
 
 <div class="d-flex flex-column h-100">
@@ -37,15 +30,27 @@
         type="text"
         class="form-control "
         id="ignore"
-        bind:value={dbFilePath}
+        bind:value={movieFilePath}
       />
     </div>
-    <button class="btn btn-primary" on:click={importAll}> Submit </button>
+    <button class="btn btn-primary" on:click={importMovieDB}> Submit </button>
+  </div>
+  <div class="d-flex m-2 gap-2">
+    <label for="path" class="form-label mx-2">InitPath</label>
+    <div class="flex-grow-1">
+      <input
+        type="text"
+        class="form-control "
+        id="path"
+        bind:value={initPath}
+      />
+    </div>
+    <button class="btn btn-primary" on:click={storeInitPath}> Submit </button>
   </div>
 
-  {#if dbFilePath}
+  {#if movieFilePath}
     <h2>DB file:</h2>
-    <p>{dbFilePath}</p>
+    <p>{movieFilePath}</p>
   {/if}
 
   {#if ignoreList.length === 0}

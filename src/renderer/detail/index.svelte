@@ -1,5 +1,6 @@
 <script lang="ts">
   import type FileTree from "../store/fileTree";
+  import fileTreeStore from "../store/fileTreeStore";
   import InfoPanel from "./components/InfoPanel.svelte";
   import OpenBtn from "./components/openBtn.svelte";
   import Search from "./components/search.svelte";
@@ -7,7 +8,7 @@
   export let node: FileTree;
 
   const addIgnore = () => {
-    // fileNodeStore.addIgnore({ fullPath: node.fullPath, recursive: false });
+    fileTreeStore.addIgnore({ fullPath: node.fullPath, recursive: false });
   };
 </script>
 

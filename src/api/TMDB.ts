@@ -30,7 +30,7 @@ export default class TMDBAPI {
     const json = await response.json();
 
     if (json && json.id) {
-      const imdbID = parseInt(json.imdb_id.slice(2));
+      const imdbID = json.imdb_id ? parseInt(json.imdb_id.slice(2)) : undefined;
       return new MovieInfo({
         title: json.title,
         tmdbID: json.id,
