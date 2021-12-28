@@ -1,4 +1,5 @@
-import type FileTree from "../store/fileTree";
+import { writable } from "svelte/store";
+import type FileTree from "./fileTree";
 
 export enum Sort {
   Random = "Random",
@@ -100,14 +101,37 @@ const filterOnDisk = (nodes: FileTree[], onlyOnDisk: boolean) => {
   }
 };
 
+export interface FilterProp {
+  sort: Sort;
+  order: Order;
+  queryStr: string;
+  onlyOnDisk: boolean;
+}
+
 export const recalcNodes = (
   originalNode: FileTree[],
-  onlyOnDisk: boolean,
-  query: string,
-  sort: Sort,
-  order: Order
+  prop: FilterProp,
 ) => {
-  let newNodes = filterOnDisk(originalNode, onlyOnDisk);
-  newNodes = queryNodes(newNodes, query);
-  return resort(newNodes, sort, order);
+  let newNodes = filterOnDisk(originalNode, prop.onlyOnDisk);
+  newNodes = queryNodes(newNodes, prop.queryStr);
+  return resort(newNodes, prop.sort, prop.order);
 };
+
+const createFilterStore = () => {
+  const filterProp = writable<FilterProp>({
+    sort: Sort.Title, order: Order.Asc, queryStr: "", onlyOnDisk: false
+  });
+
+  function setFilterProp(prop: Partial<FilterProp>) {
+    filterProp.update(oldProp => ({ ...oldProp, ...prop }));
+  }
+
+  return {
+    subscribe: filterProp.subscribe,
+    setFilterProp,
+  }
+}
+
+const filterStore = createFilterStore();
+
+export default filterStore;

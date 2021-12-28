@@ -1,5 +1,5 @@
-import { derived, get, writable } from "svelte/store";
-import { appendMovieDB, initIgnoreDB, filterFileTree, readFileTree, validateNode, getNodeDBIndex } from "./utils";
+import { get, writable } from "svelte/store";
+import { appendMovieDB, initIgnoreDB, filterFileTree, readFileTree, getNodeDBIndex } from "./utils";
 import type { IgnoreData } from "./ignore";
 import type { MediaInfo } from "./media";
 import type FileTree from "./fileTree";
@@ -9,21 +9,6 @@ const path = "D:/OneDrive - stu.xjtu.edu.cn/Media/Movies";
 function createFileTreeStore() {
   const ignoreList = writable<IgnoreData[]>([]);
   const fileTree = writable(readFileTree(path));
-  const fileNodes = derived(fileTree, $fileTree => {
-    const nodes: FileTree[] = [];
-    $fileTree.forEachWithStop(node => {
-      if (!node.isLeaf && node.media === undefined) {
-        return true;
-      } else {
-        nodes.push(node);
-        return false;
-      }
-    });
-    const filtered = nodes.filter(node =>
-      node.children ? true : validateNode(node)
-    );
-    return filtered;
-  });
 
   const importIgnoreDB = async (path: string) => {
     const dbItems = window.ignoreDBAPI.importDB(path);
@@ -106,7 +91,7 @@ function createFileTreeStore() {
   // addDirLitsener();
 
   return {
-    subscribe: fileNodes.subscribe,
+    subscribe: fileTree.subscribe,
     subscribeFileTree: fileTree.subscribe,
     subscribeIgnore: ignoreList.subscribe,
     importIgnoreDB,
