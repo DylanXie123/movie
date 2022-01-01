@@ -1,7 +1,8 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import Store from 'electron-store';
 import IgnoreDB from './ignoreDB';
 import MovieDB from './movieDB';
+import { sep } from 'path';
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -56,4 +57,25 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
+});
+
+ipcMain.on('relauch', () => {
+  app.relaunch();
+  app.exit(0);
+});
+
+ipcMain.handle('showOpenDialog', (_event, option) =>
+  dialog.showOpenDialogSync(option),
+);
+
+ipcMain.handle('showMessageBox', (_event, option) =>
+  dialog.showMessageBoxSync(option),
+);
+
+ipcMain.handle('openPath', (_event, path: string) => {
+  return shell.openPath(path.split('/').join(sep))
+});
+
+ipcMain.on('showItemInFolder', (_event, path: string) => {
+  return shell.showItemInFolder(path.split('/').join(sep))
 });

@@ -1,11 +1,21 @@
 <script lang="ts">
   import type FileTree from "../../store/fileTree";
+  import { validateNode } from "../../store/utils";
 
   export let node: FileTree;
 
-  const play = () => window.fsAPI.openFile(node.fullPath);
+  const play = () => {
+    if (node.isLeaf) {
+      window.fsAPI.openPath(node.fullPath);
+    } else {
+      const children = Array.from(node.children!.values()).filter(validateNode);
+      window.fsAPI.openPath(children[0].fullPath);
+    }
+  };
 
-  const openFolder = () => window.fsAPI.openFile(node.parsed.dir);
+  const openFolder = () => {
+    window.fsAPI.showItem(node.fullPath);
+  };
 </script>
 
 <div class="d-grid gap-2 px-4">

@@ -79,3 +79,11 @@
   <hr />
 {/if}
 <p>{node.media?.overview}</p>
+
+<style>
+  p {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+</style>

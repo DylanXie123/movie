@@ -6,7 +6,7 @@
 
 <div class="d-flex flex-column h-100">
   <HeadBar>
-    <h3 class="m-0" slot="head">
+    <h3 class="m-0" slot="head" style="white-space: nowrap;">
       {$gridViewStore.length} Movies
     </h3>
   </HeadBar>

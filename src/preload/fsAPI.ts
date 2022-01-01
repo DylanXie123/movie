@@ -1,4 +1,4 @@
-import { shell } from 'electron';
+import { ipcRenderer } from 'electron';
 import fs from 'original-fs';
 
 const readDir = (path: string) => {
@@ -36,8 +36,12 @@ const addLitsener = (path: string, listener: (filename: string) => void) => {
   });
 }
 
-const openFile = (fullPath: string) => {
-  return shell.openPath(fullPath);
+const openPath = (fullPath: string) => {
+  return ipcRenderer.invoke('openPath', fullPath) as Promise<string>;
+};
+
+const showItem = (fullPath: string) => {
+  return ipcRenderer.send('showItemInFolder', fullPath);
 };
 
 const fsAPI = {
@@ -45,7 +49,8 @@ const fsAPI = {
   statSync,
   existSync,
   addLitsener,
-  openFile,
+  openPath,
+  showItem,
 };
 
 export default fsAPI;

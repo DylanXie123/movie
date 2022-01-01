@@ -15,47 +15,38 @@
     fileTreeStore.removeIgnore(ignore);
   };
 
-  let movieFilePath: string;
-  let initPath: string;
+  const importMovieDB = async () => {
+    const path = await window.electronAPI.showOpenDialog({});
+    if (path) {
+      await fileTreeStore.importMovieDB(path[0]);
+      window.electronAPI.showMessageBox({
+        message: `Import ${path[0]} success`,
+        type: "info",
+      });
+    }
+  };
 
-  const importMovieDB = () => fileTreeStore.importMovieDB(movieFilePath);
-  const storeInitPath = () => window.storageAPI.set("path", initPath);
+  const storeInitPath = async () => {
+    const path = await window.electronAPI.showOpenDialog({
+      properties: ["openDirectory"],
+    });
+    if (path) {
+      window.electronAPI.showMessageBox({
+        message: `Import ${path[0]} success, restart to take effect`,
+        type: "info",
+      });
+      window.storageAPI.set("path", path[0]);
+      window.electronAPI.relauch();
+    }
+  };
 </script>
 
-<div class="d-flex flex-column h-100">
-  <div class="d-flex m-2 gap-2">
-    <label for="ignore" class="form-label mx-2">DB</label>
-    <div class="flex-grow-1">
-      <input
-        type="text"
-        class="form-control "
-        id="ignore"
-        bind:value={movieFilePath}
-      />
-    </div>
-    <button class="btn btn-primary" on:click={importMovieDB}> Submit </button>
-  </div>
-  <div class="d-flex m-2 gap-2">
-    <label for="path" class="form-label mx-2">InitPath</label>
-    <div class="flex-grow-1">
-      <input
-        type="text"
-        class="form-control "
-        id="path"
-        bind:value={initPath}
-      />
-    </div>
-    <button class="btn btn-primary" on:click={storeInitPath}> Submit </button>
-  </div>
-
-  {#if movieFilePath}
-    <h2>DB file:</h2>
-    <p>{movieFilePath}</p>
-  {/if}
-
-  {#if ignoreList.length === 0}
-    <p>Empty Ignore List</p>
-  {:else}
+<button class="btn btn-primary" on:click={importMovieDB}>DB</button>
+<button class="btn btn-primary" on:click={storeInitPath}>Path</button>
+{#if ignoreList.length === 0}
+  <p>Empty Ignore List</p>
+{:else}
+  <div class="d-flex flex-column h-100">
     <div class="flex-grow-1 overflow-auto container-xxl">
       <ul class="list-group" data-simplebar>
         {#each ignoreList as ignore (ignore.fullPath)}
@@ -70,5 +61,5 @@
         {/each}
       </ul>
     </div>
-  {/if}
-</div>
+  </div>
+{/if}

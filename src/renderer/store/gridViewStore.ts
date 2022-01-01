@@ -13,17 +13,25 @@ const createGridViewStore = (fileTreeStore: Readable<FileTree>, filterStore: Rea
   function flatTree(tree: FileTree) {
     const nodes: FileTree[] = [];
     tree.forEachWithStop(node => {
-      if (!node.isLeaf && node.media === undefined) {
-        return true;
-      } else {
+      if (node.media) {
         nodes.push(node);
         return false;
       }
+      if (!node.isLeaf) {
+        const children = Array.from(node.children!.values());
+        const validChildren = children.filter(validateNode);
+        if (validChildren.length === 1) {
+          nodes.push(node);
+          return false;
+        }
+      }
+      if (node.isLeaf && validateNode(node)) {
+        nodes.push(node);
+        return false
+      }
+      return true;
     });
-    const filtered = nodes.filter(node =>
-      node.children ? true : validateNode(node)
-    );
-    return filtered;
+    return nodes;
   }
 
   return {
