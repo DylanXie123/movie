@@ -4,14 +4,7 @@ import type { IgnoreData } from "./ignore";
 import type { MediaInfo } from "./media";
 import type FileTree from "./fileTree";
 
-let path = "";
-const retrieve = window.storageAPI.get("path");
-if (retrieve) {
-  path = retrieve as string;
-} else {
-  path = "D:/OneDrive - stu.xjtu.edu.cn/Media/Movies";
-  window.storageAPI.set("path", path);
-}
+const path = window.storageAPI.get("path") as string ?? "";
 
 function createFileTreeStore() {
   const ignoreList = writable<IgnoreData[]>([]);

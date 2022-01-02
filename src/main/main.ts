@@ -2,7 +2,7 @@ import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import Store from 'electron-store';
 import IgnoreDB from './ignoreDB';
 import MovieDB from './movieDB';
-import { sep } from 'path';
+import { sep, posix } from 'path';
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -64,18 +64,23 @@ ipcMain.on('relauch', () => {
   app.exit(0);
 });
 
-ipcMain.handle('showOpenDialog', (_event, option) =>
-  dialog.showOpenDialogSync(option),
-);
+ipcMain.handle('showOpenDialog', (_event, option) => {
+  const paths = dialog.showOpenDialogSync(option);
+  if (paths) {
+    return paths.map(path => path.split(sep).join(posix.sep));
+  } else {
+    return undefined;
+  }
+});
 
 ipcMain.handle('showMessageBox', (_event, option) =>
   dialog.showMessageBoxSync(option),
 );
 
 ipcMain.handle('openPath', (_event, path: string) => {
-  return shell.openPath(path.split('/').join(sep))
+  return shell.openPath(path.split(posix.sep).join(sep));
 });
 
 ipcMain.on('showItemInFolder', (_event, path: string) => {
-  return shell.showItemInFolder(path.split('/').join(sep))
+  return shell.showItemInFolder(path.split(posix.sep).join(sep))
 });

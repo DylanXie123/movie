@@ -24,6 +24,7 @@ export const readFileTree = (path: string): FileTree | undefined => {
     const rootNode = readLeafFileTree(path);
     if (window.fsAPI.statSync(path).isDirectory) {
       const dirs = window.fsAPI.readDir(path);
+      // file was joined in posix path here
       const children = dirs.map(dir => readFileTree(join(path, dir.name)));
       const valid = children.filter(child => child !== undefined) as FileTree[];
       return new FileTree(rootNode, valid);
