@@ -5,6 +5,7 @@
   import viewState, { View } from "./viewState";
   import selectedStore from "../store/selectStore";
   import ErrorBoundary from "../common/ErrorBoundary";
+  import SideNotification from "./components/sideNotification.svelte";
 </script>
 
 <ErrorBoundary>
@@ -22,4 +23,5 @@
       </div>
     {/if}
   </div>
+  <SideNotification />
 </ErrorBoundary>

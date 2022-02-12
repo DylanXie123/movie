@@ -2,13 +2,14 @@ const rules = require('./webpack.rules');
 const path = require('path');
 const Dotenv = require('dotenv-webpack');
 const sveltePreprocess = require("svelte-preprocess");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 rules.push(
   {
     test: /\.(s[ac]ss|css)$/i,
     use: [
-      "style-loader",
-      "css-loader",
+      MiniCssExtractPlugin.loader,
+      { loader: "css-loader", options: { sourceMap: true }, },
       "sass-loader",
     ],
   },
@@ -17,7 +18,22 @@ rules.push(
     use: {
       loader: 'svelte-loader',
       options: {
-        preprocess: sveltePreprocess(),
+        preprocess: sveltePreprocess({
+          typescript: {
+            tsconfigDirectory: './'
+          },
+          scss: {
+            renderSync: true,
+          }
+        }),
+        emitCss: true,
+        onwarn: (warning, handler) => {
+          const { code } = warning;
+          if (code === "css-unused-selector")
+            return;
+
+          handler(warning);
+        },
       }
     },
   },
@@ -29,6 +45,7 @@ rules.push(
 
 module.exports = {
   // Put your normal webpack config below here
+  devtool: 'inline-source-map',
   module: {
     rules,
   },
@@ -43,6 +60,7 @@ module.exports = {
     }
   },
   plugins: [
-    new Dotenv()
+    new Dotenv(),
+    new MiniCssExtractPlugin(),
   ],
 };

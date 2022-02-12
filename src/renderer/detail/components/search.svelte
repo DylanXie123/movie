@@ -9,7 +9,7 @@
   enum Status {
     Init,
     Loading,
-    Loaded,
+    Complete,
     Error,
   }
 
@@ -23,7 +23,7 @@
     TMDBAPI.searchMulti(query)
       .then((res) => {
         results = res;
-        status = Status.Loaded;
+        status = Status.Complete;
       })
       .catch(() => (status = Status.Error));
   };
@@ -81,7 +81,7 @@
       <ul class="list-group">
         {#if status === Status.Error}
           <li class="list-group-item">Error...</li>
-        {:else if status === Status.Loaded}
+        {:else if status === Status.Complete}
           {#if results.length === 0}
             <li class="list-group-item">Empty</li>
           {:else}

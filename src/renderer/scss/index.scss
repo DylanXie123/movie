@@ -1,13 +1,10 @@
-$primary: rgb(167, 66, 235);
-$secondary: rgb(173, 181, 189);
-$light: rgba(
-  $color: rgb(173, 181, 189),
-  $alpha: 0.3,
-);
-$dark: rgb(26, 33, 41);
-$body-color: rgb(238, 238, 238);
-$body-bg: $dark;
+// override default settings in _custom.scss
+@import "./custom";
 
+// import all bootstrap style
+@import "bootstrap/scss/bootstrap";
+
+// custom code here
 .simplebar-scrollbar::before {
   background-color: #a8bbbf;
 }
@@ -19,7 +16,3 @@ $body-bg: $dark;
 ::-webkit-scrollbar {
   width: 0px;
 }
-
-$form-check-input-border: 1px solid rgba(white, 0.5);
-
-@import "bootstrap/scss/bootstrap";

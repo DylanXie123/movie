@@ -3,10 +3,12 @@
   import Home from "./home/index.svelte";
   import viewState, { View } from "./home/viewState";
   import Settings from "./settings/index.svelte";
+  import Manage from "./manage/index.svelte";
 
   const routes = {
     "/": Home,
     "/settings": Settings,
+    "/manage": Manage,
   };
 
   const toggleView = () =>
