@@ -14,21 +14,19 @@
   `;
 </script>
 
-<div class="col-sm-6 col-md-4 col-lg-3 col-xl-2">
-  <div class="position-relative">
-    <div
-      on:click|stopPropagation={() => {
-        selectedStore.set(node);
-      }}
-      type="button"
-    >
-      <div class="ratio" style="--bs-aspect-ratio: 150%;">
-        <Image
-          src={node.media?.getPosterURL()}
-          srcset={node.media?.posterURL ? getSrcset(node) : undefined}
-          alt={node.media?.title}
-        />
-      </div>
+<div class="col-span-6 sm:col-span-3">
+  <div
+    on:click|stopPropagation={() => {
+      selectedStore.set(node);
+    }}
+    type="button"
+  >
+    <div class="w-full">
+      <Image
+        src={node.media?.getPosterURL()}
+        srcset={node.media?.posterURL ? getSrcset(node) : undefined}
+        alt={node.media?.title}
+      />
     </div>
   </div>
 </div>

@@ -15,23 +15,23 @@
     viewState.update((v) => (v === View.Grid ? View.Column : View.Grid));
 </script>
 
-<div class="d-flex flex-column vh-100">
-  <nav
-    class="navbar navbar-expand-lg navbar-dark sticky-top bg-dark border-bottom border-light"
-  >
-    <a class="navbar-brand me-auto p-2" href="/" use:link>
-      <i class="bi bi-film" />
-      <span>MovieDB</span>
+<div class="h-screen flex flex-col bg-slate-900">
+  <nav class="flex flex-row border-b-[1px] border-gray-500">
+    <a class="m-2" href="/" use:link>
+      <i class="bi bi-film text-2xl" />
+      <h1 class="text-2xl inline">MovieDB</h1>
     </a>
-    <span class="nav-link" role="button" on:click={toggleView}>
-      <i class="bi bi-shuffle" />
-    </span>
-    <a class="nav-link" href="/settings" use:link>
-      <i class="bi bi-gear-wide-connected" />
-    </a>
+    <div class="grow flex flex-row justify-end">
+      <span class="self-center mr-4" role="button" on:click={toggleView}>
+        <i class="bi bi-shuffle" />
+      </span>
+      <a class="self-center mr-4" href="/settings" use:link>
+        <i class="bi bi-gear-wide-connected" />
+      </a>
+    </div>
   </nav>
 
-  <div class="flex-grow-1 overflow-hidden">
+  <div class="grow overflow-hidden">
     <Router {routes} />
   </div>
 </div>

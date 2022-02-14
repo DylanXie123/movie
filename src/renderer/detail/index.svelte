@@ -12,7 +12,7 @@
   };
 </script>
 
-<div class="h-100" style="overflow-x: hidden;" data-simplebar>
+<div class="h-full overflow-y-auto" data-simplebar>
   <Search {node} />
   <div>
     {#if node.media !== undefined}
@@ -23,10 +23,8 @@
       </div>
     {/if}
   </div>
-  <div class="d-grid col-6 mx-auto">
-    <button class="btn btn-secondary" on:click={addIgnore}>
-      <i class="bi bi-dash-circle" />
-      <span>Ignore</span>
-    </button>
-  </div>
+  <button class="btn" on:click={addIgnore}>
+    <i class="bi bi-dash-circle" />
+    <span>Ignore</span>
+  </button>
 </div>

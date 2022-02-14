@@ -23,65 +23,60 @@
   srcset={getSrcset(node)}
   alt="poster"
   {placeholder}
+  classStr="w-full"
 />
-<h1 class="m-2">{node.media?.title}</h1>
-<p class="text-secondary mb-3">{node.media?.genres.join(", ")}</p>
+<h1 class="text-xl font-bold ml-2 my-2">{node.media?.title}</h1>
+<p class="text-gray-400 ml-2 mb-2">{node.media?.genres.join(", ")}</p>
 <OpenBtn {node} />
-<div class="row my-3 g-1">
-  <div class="col-4">
-    <p class="text-secondary mb-0">Language</p>
-    {node.media?.language}
+<div class="grid grid-cols-3 gap-1 mx-2">
+  <div class="col-span-1">
+    <p class="text-gray-400 ellipsis">Language</p>
+    <p>{node.media?.language}</p>
   </div>
-  <div class="col-4">
-    <p class="text-secondary mb-0">ReleaseDate</p>
+  <div class="col-span-1">
+    <p class="text-gray-400 ellipsis">ReleaseDate</p>
     {getDateString(node.media?.releaseDate)}
   </div>
-  <div class="col-4">
-    <p class="text-secondary mb-0">Rating</p>
+  <div class="col-span-1">
+    <p class="text-gray-400 ellipsis">Rating</p>
     {node.media?.tmdbRating}
   </div>
-  <div class="col-4">
+  <div class="col-span-1">
     {#if node.media instanceof MovieInfo}
-      <p class="text-secondary mb-0">Runtime</p>
+      <p class="text-gray-400 ellipsis">Runtime</p>
       {node.media.runtime}
     {:else if node.media instanceof TVInfo}
-      <p class="text-secondary mb-0">Seasons</p>
+      <p class="text-gray-400 ellipsis">Seasons</p>
       {node.media.seasons.length}
     {/if}
   </div>
-  <div class="col-4">
-    <p class="text-secondary mb-0">TMDB</p>
+  <div class="col-span-1">
+    <p class="text-gray-400 ellipsis">TMDB</p>
     {node.media?.tmdbID}
   </div>
-  <div class="col-4">
-    <p class="text-secondary mb-0">IMDB</p>
+  <div class="col-span-1">
+    <p class="text-gray-400 ellipsis">IMDB</p>
     tt{node.media?.imdbID}
   </div>
 </div>
 <hr />
 {#if node.media?.credits}
-  <div
-    class="overflow-auto my-3"
-    data-simplebar
-    data-simplebar-auto-hide="false"
-  >
-    <div class="row flex-nowrap">
+  <div class="overflow-x-auto" data-simplebar data-simplebar-auto-hide="false">
+    <div class="flex flex-row flex-nowrap my-2 p-0">
       {#each node.media.credits as cast}
-        <div class="col-3">
-          <div class="ratio" style="--bs-aspect-ratio: 150%;">
-            <Image src={cast.getProfileURL()} alt={cast.name} />
-          </div>
-          <p class="text-secondary mb-0">{cast.name}</p>
+        <div class="inline-block flex-none w-20 sm:w-28 mx-1">
+          <Image src={cast.getProfileURL()} alt={cast.name} classStr="w-full shadow rounded aspect-[2/3]" />
+          <p class="text-gray-400 ellipsis">{cast.name}</p>
         </div>
       {/each}
     </div>
   </div>
   <hr />
 {/if}
-<p>{node.media?.overview}</p>
+<p class="m-2">{node.media?.overview}</p>
 
 <style>
-  p {
+  p.ellipsis {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;

@@ -10,7 +10,7 @@ rules.push(
     use: [
       MiniCssExtractPlugin.loader,
       { loader: "css-loader", options: { sourceMap: true }, },
-      "sass-loader",
+      "postcss-loader",
     ],
   },
   {
@@ -22,9 +22,7 @@ rules.push(
           typescript: {
             tsconfigDirectory: './'
           },
-          scss: {
-            renderSync: true,
-          }
+          postcss: true,
         }),
         emitCss: true,
         onwarn: (warning, handler) => {
@@ -45,7 +43,7 @@ rules.push(
 
 module.exports = {
   // Put your normal webpack config below here
-  devtool: 'inline-source-map',
+  devtool: 'source-map',
   module: {
     rules,
   },

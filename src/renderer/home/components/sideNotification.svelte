@@ -11,18 +11,7 @@
 </script>
 
 {#if emptyCount > 0}
-  <div class="notification-box" on:click={handleClick}>
+  <div class="fixed bottom-0 right-0" on:click={handleClick}>
     {`${emptyCount} empty movies`}
   </div>
 {/if}
-
-<style lang="scss">
-  @import "../../scss/index.scss";
-
-  .notification-box {
-    @extend .position-fixed;
-    bottom: 10px;
-    right: 0;
-    background-color: $primary;
-  }
-</style>

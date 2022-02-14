@@ -4,15 +4,15 @@
   import MovieCard from "./movieCard.svelte";
 </script>
 
-<div class="d-flex flex-column h-100">
+<div class="flex flex-col h-full">
   <HeadBar>
-    <h3 class="m-0" slot="head" style="white-space: nowrap;">
+    <h3 slot="head" class="text-xl whitespace-nowrap">
       {$gridViewStore.length} Movies
     </h3>
   </HeadBar>
-  <div class="flex-grow-1 overflow-auto" data-simplebar>
-    <div class="container px-lg-5">
-      <div class="row g-4">
+  <div class="grow overflow-hidden">
+    <div class="h-full overflow-auto" data-simplebar>
+      <div class="grid grid-cols-12 justify-items-stretch gap-4">
         {#each $gridViewStore as node (node.fullPath)}
           <MovieCard {node} />
         {/each}

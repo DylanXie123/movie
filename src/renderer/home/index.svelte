@@ -9,8 +9,8 @@
 </script>
 
 <ErrorBoundary>
-  <div class="row justify-content-center h-100">
-    <div class="col-lg-9 col-sm-8 h-100">
+  <div class="flex flex-row h-full">
+    <div class="flex-1 sm:flex-[2]">
       {#if $viewState === View.Grid}
         <GridView />
       {:else}
@@ -18,7 +18,7 @@
       {/if}
     </div>
     {#if $selectedStore}
-      <div class="col-lg-3 col-sm-4 ps-2 h-100">
+      <div class="flex-1">
         <DetailSidebar node={$selectedStore} />
       </div>
     {/if}

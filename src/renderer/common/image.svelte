@@ -1,7 +1,7 @@
 <script lang="ts">
   import Placeholder from "./placeholder.jpg";
   export let src: string | undefined;
-  export let classStr: string = "shadow rounded img-fluid";
+  export let classStr: string = "shadow rounded w-full";
   export let srcset: string | undefined = undefined;
   export let alt: string | undefined;
   export let placeholder = Placeholder;

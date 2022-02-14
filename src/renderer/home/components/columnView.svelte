@@ -3,28 +3,22 @@
   import HeadBar from "./headBar.svelte";
 </script>
 
-<div class="h-100">
+<div class="flex flex-col h-full w-full">
   <HeadBar />
-  <div class="d-flex container-fluid h-100">
+  <div class="grow w-full overflow-hidden flex flex-row">
     {#each $columnViewStore as nodes}
-      <div
-        class="flex-grow-1 overflow-auto"
-        style="min-width: 0;"
-        data-simplebar
-      >
-        <div class="list-group list-group-flush">
-          {#each nodes as child}
-            <button
-              class="list-group-item list-group-item-dark list-group-item-action text-nowrap"
-              title={child.parsed.base}
-              on:click={() => columnViewStore.select(child)}
-            >
-              <div style="text-overflow:ellipsis; overflow:hidden;">
-                {child.parsed.base}
-              </div>
-            </button>
-          {/each}
-        </div>
+      <div class="flex-grow overflow-y-auto min-w-0" data-simplebar>
+        {#each nodes as child}
+          <button
+            class="btn whitespace-normal"
+            title={child.parsed.base}
+            on:click={() => columnViewStore.select(child)}
+          >
+            <div class="overflow-hidden text-ellipsis">
+              {child.parsed.base}
+            </div>
+          </button>
+        {/each}
       </div>
     {/each}
   </div>
