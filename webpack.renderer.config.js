@@ -6,7 +6,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 rules.push(
   {
-    test: /\.(s[ac]ss|css)$/i,
+    test: /\.css$/i,
     use: [
       MiniCssExtractPlugin.loader,
       { loader: "css-loader", options: { sourceMap: true }, },
@@ -49,7 +49,8 @@ module.exports = {
   },
   resolve: {
     alias: {
-      svelte: path.dirname(require.resolve('svelte/package.json'))
+      svelte: path.dirname(require.resolve('svelte/package.json')),
+      '@': path.resolve(__dirname, 'src/renderer/'),
     },
     extensions: ['.mjs', '.js', '.ts', '.svelte'],
     mainFields: ['svelte', 'browser', 'module', 'main'],

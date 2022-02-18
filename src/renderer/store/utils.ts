@@ -1,8 +1,8 @@
 import { join, parse } from 'path';
-import TMDBAPI from "../../api/TMDB";
-import FileTree from './fileTree';
-import type { IgnoreData } from "./ignore";
-import { MovieInfo, TVInfo } from './media';
+import TMDBAPI from "@/api/TMDB";
+import FileTree from '@/store/fileTree';
+import type { IgnoreData } from "@/store/ignore";
+import { MovieInfo, TVInfo } from '@/store/media';
 
 export const readLeafFileTree = (path: string) => {
   const stat = window.fsAPI.statSync(path);

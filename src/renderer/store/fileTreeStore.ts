@@ -1,8 +1,8 @@
 import { get, writable } from "svelte/store";
 import { appendMovieDB, initIgnoreDB, filterFileTree, readFileTree, getNodeDBIndex } from "./utils";
-import type { IgnoreData } from "./ignore";
-import type { MediaInfo } from "./media";
-import type FileTree from "./fileTree";
+import type { IgnoreData } from "@/store/ignore";
+import type { MediaInfo } from "@/store/media";
+import type FileTree from "@/store/fileTree";
 
 const path = window.storageAPI.get("path") as string ?? "";
 
