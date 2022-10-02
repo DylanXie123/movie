@@ -1,6 +1,6 @@
-import ErrorBoundary from './ErrorBoundary.svelte'
+import ErrorBoundaryComponent from '../ErrorBoundary.svelte'
 
-export default class errorBoundary extends ErrorBoundary {
+export default class ErrorBoundary extends ErrorBoundaryComponent {
 	constructor(config) {
 		config.props.$$slots.default = config.props.$$slots.default.map(x => (...args) => {
 			try {

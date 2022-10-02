@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type FileTree from "../../store/fileTree";
-  import Image from "../../common/image.svelte";
-  import selectedStore from "../../store/selectStore";
+  import type FileTree from "renderer/store/fileTree";
+  import PImage from "renderer/components/PImage/PImage.svelte";
+  import selectedStore from "renderer/store/selectStore";
 
   export let node: FileTree;
 
@@ -23,7 +23,7 @@
       type="button"
     >
       <div class="ratio" style="--bs-aspect-ratio: 150%;">
-        <Image
+        <PImage
           src={node.media?.getPosterURL()}
           srcset={node.media?.posterURL ? getSrcset(node) : undefined}
           alt={node.media?.title}

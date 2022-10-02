@@ -1,5 +1,5 @@
 <script lang="ts">
-  import filterStore, { Order, Sort } from "../../store/filterStore";
+  import filterStore, { Order, Sort } from "renderer/store/filterStore";
 
   const handleCheck = (e: any) => {
     const checked = e.target.checked;

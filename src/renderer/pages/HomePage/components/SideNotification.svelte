@@ -1,7 +1,7 @@
 <script lang="ts">
   import { push } from "svelte-spa-router";
 
-  import gridViewStore from "../../store/gridViewStore";
+  import gridViewStore from "renderer/store/gridViewStore";
 
   const handleClick = () => {
     push("/manage");
@@ -16,7 +16,7 @@
   </div>
 {/if}
 
-<style lang="scss">
+<!-- <style lang="scss">
   @import "../../scss/index.scss";
 
   .notification-box {
@@ -25,4 +25,4 @@
     right: 0;
     background-color: $primary;
   }
-</style>
+</style> -->

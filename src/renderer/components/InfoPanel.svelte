@@ -1,10 +1,10 @@
 <script lang="ts">
-  import Image from "../../common/image.svelte";
-  import placeholder from "./hPlaceholder.jpg";
-  import getDateString from "./getDateString";
-  import OpenBtn from "./openBtn.svelte";
-  import { MovieInfo, TVInfo } from "../../store/media";
-  import type FileTree from "../../store/fileTree";
+  import PImage from "./PImage/PImage.svelte";
+  import placeholder from "./PImage/hPlaceholder.jpg";
+  import getDateString from "../store/getDateString";
+  import OpenBtn from "./OpenBtn.svelte";
+  import type FileTree from "../store/fileTree";
+  import { MovieInfo, TVInfo } from "../store/media";
 
   /**
    * `node.media` must not be undefined
@@ -18,7 +18,7 @@
   `;
 </script>
 
-<Image
+<PImage
   src={node.media?.getBackgroundURL()}
   srcset={getSrcset(node)}
   alt="poster"
@@ -69,7 +69,7 @@
       {#each node.media.credits as cast}
         <div class="col-3">
           <div class="ratio" style="--bs-aspect-ratio: 150%;">
-            <Image src={cast.getProfileURL()} alt={cast.name} />
+            <PImage src={cast.getProfileURL()} alt={cast.name} />
           </div>
           <p class="text-secondary mb-0">{cast.name}</p>
         </div>

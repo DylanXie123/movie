@@ -1,4 +1,4 @@
-import { CastInfo, MediaInfo, MovieInfo, SeasonInfo, TVInfo } from "../renderer/store/media";
+import { CastInfo, MediaInfo, MovieInfo, SeasonInfo, TVInfo } from "../store/media";
 import IMDBAPI from "./IMDB";
 
 /**

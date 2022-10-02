@@ -1,5 +1,5 @@
 import { join, parse } from 'path';
-import TMDBAPI from "../../api/TMDB";
+import TMDBAPI from "../api/TMDB";
 import FileTree from './fileTree';
 import type { IgnoreData } from "./ignore";
 import { MovieInfo, TVInfo } from './media';

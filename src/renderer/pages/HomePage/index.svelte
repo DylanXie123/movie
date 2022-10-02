@@ -1,11 +1,11 @@
 <script lang="ts">
-  import ColumnView from "./components/columnView.svelte";
-  import GridView from "./components/gridView.svelte";
-  import DetailSidebar from "../detail/index.svelte";
+  import ColumnView from "./views/ColumnView.svelte";
+  import GridView from "./views/GridView.svelte";
+  import DetailSidebar from "./views/DetailView.svelte";
   import viewState, { View } from "./viewState";
-  import selectedStore from "../store/selectStore";
-  import ErrorBoundary from "../common/ErrorBoundary";
-  import SideNotification from "./components/sideNotification.svelte";
+  import selectedStore from "renderer/store/selectStore";
+  import SideNotification from "./components/SideNotification.svelte";
+  import ErrorBoundary from "renderer/components/ErrorBoundary/ErrorBoundary.svelte";
 </script>
 
 <ErrorBoundary>

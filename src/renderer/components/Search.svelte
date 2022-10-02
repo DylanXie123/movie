@@ -1,10 +1,10 @@
 <script lang="ts">
-  import TMDBAPI from "../../../api/TMDB";
-  import Image from "../../common/image.svelte";
-  import type FileTree from "../../store/fileTree";
-  import fileTreeStore from "../../store/fileTreeStore";
-  import type { MediaInfo } from "../../store/media";
-  import getDateString from "./getDateString";
+  import PImage from "./PImage/PImage.svelte";
+  import getDateString from "../store/getDateString";
+  import type FileTree from "../store/fileTree";
+  import type { MediaInfo } from "renderer/store/media";
+  import TMDBAPI from "renderer/api/TMDB";
+  import fileTreeStore from "renderer/store/fileTreeStore";
 
   enum Status {
     Init,
@@ -91,7 +91,7 @@
                 class="list-group-item d-flex p-1"
                 style="height: 100px;"
               >
-                <Image
+                <PImage
                   src={movie.getPosterURL()}
                   alt={movie.title}
                   classStr="shadow rounded img-fluid h-100"

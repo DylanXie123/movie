@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type FileTree from "../../store/fileTree";
-  import { validateNode } from "../../store/utils";
+  import type FileTree from "renderer/store/fileTree";
+  import { validateNode } from "renderer/store/utils";
 
   export let node: FileTree;
 

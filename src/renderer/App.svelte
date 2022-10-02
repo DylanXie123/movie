@@ -1,9 +1,9 @@
 <script lang="ts">
   import Router, { link } from "svelte-spa-router";
-  import Home from "./home/index.svelte";
-  import viewState, { View } from "./home/viewState";
-  import Settings from "./settings/index.svelte";
-  import Manage from "./manage/index.svelte";
+  import Home from "./pages/HomePage/index.svelte";
+  import viewState, { View } from "./pages/HomePage/viewState";
+  import Settings from "./pages/SettingsPage/index.svelte";
+  import Manage from "./pages/ManagePage/index.svelte";
 
   const routes = {
     "/": Home,

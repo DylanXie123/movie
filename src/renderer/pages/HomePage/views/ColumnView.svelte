@@ -1,6 +1,6 @@
 <script lang="ts">
-  import columnViewStore from "../../store/columnViewStore";
-  import HeadBar from "./headBar.svelte";
+  import columnViewStore from "renderer/store/columnViewStore";
+  import HeadBar from "../components/HeadBar.svelte";
 </script>
 
 <div class="h-100">

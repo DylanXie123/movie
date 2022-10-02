@@ -1,7 +1,7 @@
 <script lang="ts">
-  import gridViewStore from "../../store/gridViewStore";
-  import HeadBar from "./headBar.svelte";
-  import MovieCard from "./movieCard.svelte";
+  import gridViewStore from "renderer/store/gridViewStore";
+  import HeadBar from "../components/HeadBar.svelte";
+  import MovieCard from "../components/MovieCard.svelte";
 </script>
 
 <div class="d-flex flex-column h-100">

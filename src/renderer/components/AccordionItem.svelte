@@ -1,6 +1,6 @@
 <script lang="ts">
-  import TMDBAPI from "../../../api/TMDB";
-  import type { MediaInfo } from "../../store/media";
+  import TMDBAPI from "../api/TMDB";
+  import type { MediaInfo } from "../store/media";
 
   export let title: string;
 

@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type FileTree from "../store/fileTree";
-  import fileTreeStore from "../store/fileTreeStore";
-  import InfoPanel from "./components/InfoPanel.svelte";
-  import OpenBtn from "./components/openBtn.svelte";
-  import Search from "./components/search.svelte";
+  import type FileTree from "renderer/store/fileTree";
+  import fileTreeStore from "renderer/store/fileTreeStore";
+  import InfoPanel from "renderer/components/InfoPanel.svelte";
+  import OpenBtn from "renderer/components/OpenBtn.svelte";
+  import Search from "renderer/components/Search.svelte";
 
   export let node: FileTree;
 
